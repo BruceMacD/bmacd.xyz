@@ -1,0 +1,146 @@
+:root {
+    --width: 800px;
+    --font-main: Verdana, sans-serif;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --code-background: #f2f2f2;
+    --code-color: #222;
+    --blockquote-color: #222;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #01242e;
+        --heading-color: #eee;
+        --text-color: #ddd;
+        --link-color: #8cc2dd;
+        --code-background: #000;
+        --code-color: #ddd;
+        --blockquote-color: #ccc;
+    }
+}
+
+body {
+    font-family: var(--font-main);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    color: var(--heading-color);
+}
+
+.title h1 {
+    color: #eee;
+    text-shadow: 1px 1px 0 #eb99a1, 
+                 2px 2px 0 #eb99a1,
+                 3px 3px 0 #eb99a1,
+                 4px 4px 0 #eb99a1,
+                 5px 5px 0 #eb99a1;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: var(--visited-color);
+}
+
+nav {
+    margin-bottom: 40px;
+}
+
+nav a {
+    margin-right: 15px;
+}
+
+code {
+    background-color: var(--code-background);
+    color: var(--code-color);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+blockquote {
+    border-left: 1px solid #999;
+    color: var(--code-color);
+    padding-left: 20px;
+    font-style: italic;
+}
+
+/* Blog specific styles */
+ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+}
+
+ul.blog-posts li {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+ul.blog-posts li span {
+    flex: 0 0 130px;
+}
+
+.tags {
+    margin-top: 20px;
+}
+
+.tags a {
+    margin-right: 10px;
+    font-size: 0.9em;
+}
+
+/* Code blocks */
+.highlight {
+    padding: 1px 15px;
+    background-color: var(--code-background);
+    color: var(--code-color);
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+/* Blog post specific */
+.post-header {
+    margin-bottom: 30px;
+}
+
+.post-date {
+    color: var(--text-color);
+    font-style: italic;
+}
+
+.post-content {
+    margin-top: 20px;
+}
+
+ul {
+    padding-left: 20px;
+}
