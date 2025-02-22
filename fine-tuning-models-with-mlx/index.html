@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine-Tuning Models with MLX | bmacd.xyz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="post">
+    <header>
+        <a class="title" href="/">
+            <h1>bmacd.xyz</h1>
+        </a>
+        <nav>
+            <a href="../../index.html">Home</a>
+            <a href="../index.html">Blog</a>
+            <a href="https://github.com/BruceMacD">Github</a>
+            <a href="https://twitter.com/_bmacd">Twitter</a>
+        </nav>
+    </header>
+
+    <main>
+        <article>
+            <div class="post-header">
+                <h1>Fine-Tuning Models with MLX</h1>
+                <p class="post-date">
+                    <i>
+                        <time datetime="2024-03-04T05:24Z">03 Mar, 2024</time>
+                    </i>
+                </p>
+            </div>
+
+            <div class="post-content">
+                <blockquote>
+                    <p>Last updated: March 4, 2024</p>
+                </blockquote>
+
+                <p>Open-source and local large language models (LLMs) really start to shine when customized for your personal needs. One way to improve an LLM's performance on a specific task is to fine-tune the model.</p>
+
+                <p>There are numerous ways to fine-tune a model, this guide will outline my process of creating a low rank adaptation (LoRA) on Apple hardware with MLX.</p>
+
+                <p>Overview:</p>
+                <ul>
+                    <li><a href="#problem">Problem</a></li>
+                    <li><a href="#model-evaluation">Model evaluation</a></li>
+                    <li><a href="#dataset">Dataset</a></li>
+                    <li><a href="#fine-tuning">Fine-Tuning</a></li>
+                    <li><a href="#quantizing">Quantizing</a></li>
+                    <li><a href="#sharing">Sharing</a></li>
+                </ul>
+
+                <h2 id="problem">Problem</h2>
+                <p>
+                    <img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1709530085-0.png" alt="mochi-diffusion astronaut">
+                    I am using <a href="https://github.com/godly-devotion/MochiDiffusion">Mochi Diffusion</a> to run Stable Diffusion locally and generate images. The challenge? My basic prompts yield uninspiring results.
+                </p>
+
+                <h2 id="model-evaluation">Model Evaluation</h2>
+                <p>
+                    <img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1709530218-0.png" alt="mistral stable diffusion prompt">
+                    I need to fine-tune a model to get the output I want. So it's time to choose a model to fine-tune. Generating a Stable Diffusion prompt is a fairly constrained task so a smaller model will be sufficient. I'll fine-tune on Mistral's 7 billion parameter model.
+                </p>
+
+                <h2 id="dataset">Dataset</h2>
+                <p>A good dataset is the key to getting good results from a fine-tune. Sometimes this will mean building a dataset in the format you need. If you're lucky a high quality dataset will already exist. In this case a high-quality instructional dataset for Stable Diffusion prompts already exists on <a href="https://huggingface.co/datasets/MadVoyager/stable_diffusion_instructional_dataset">Hugging Face</a>.</p>
+
+                <p>I need the dataset in <code>jsonl</code> format so I convert the parquet file using <a href="https://marketplace.visualstudio.com/items?itemName=dvirtz.parquet-viewer">parquet-viewer</a>.</p>
+
+                <h2 id="fine-tuning">Fine-Tuning</h2>
+                <p>Split the data into a training and verification dataset. I do this using a simple python script:</p>
+
+                <div class="highlight">
+                    <pre><code>def split_jsonl_file(input_filename):
+    # Read all lines from the input file
+    with open(input_filename, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+
+    # Calculate split index for 80% of data
+    split_index = int(len(lines) * 0.8)
+
+    # Write the first 80% of lines to train.jsonl
+    with open('train.jsonl', 'w', encoding='utf-8') as train_file:
+        train_file.writelines(lines[:split_index])
+
+    # Write the remaining 20% of lines to valid.jsonl
+    with open('valid.jsonl', 'w', encoding='utf-8') as valid_file:
+        valid_file.writelines(lines[split_index:])</code></pre>
+                </div>
+
+                <p>Clone the MLX examples repo and install the lora example requirements.</p>
+
+                <div class="highlight">
+                    <pre><code>$ git clone https://github.com/ml-explore/mlx-examples.git
+$ cd lora/
+$ pip install -r requirements.txt</code></pre>
+                </div>
+
+                <h2 id="results">Results</h2>
+                <div class="highlight">
+                    <pre><code>$ ollama run brxce/stable-diffusion-prompt-generator
+>>> an astronaut on a horse
+Astronaut on a horse, ultra realistic, digital art, concept art, smooth, sharp focus, illustration, highly detailed, cinematic lighting, in the style of Tom Rockwell and Zdenko and Laura Cok</code></pre>
+                </div>
+
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1709530888-0.png" alt="result"></p>
+
+                <div class="tags">
+                    <a href="/blog/?q=fine-tuning">#fine-tuning</a>
+                    <a href="/blog/?q=llms">#llms</a>
+                    <a href="/blog/?q=mistral">#mistral</a>
+                    <a href="/blog/?q=ollama">#ollama</a>
+                    <a href="/blog/?q=stable-diffusion">#stable-diffusion</a>
+                </div>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
