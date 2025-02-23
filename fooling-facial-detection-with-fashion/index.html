@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fooling Facial Detection with Fashion | bmacd.xyz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="post">
+    <header>
+        <a class="title" href="../">
+            <h1>bmacd.xyz</h1>
+        </a>
+        <nav>
+            <a href="../">Home</a>
+            <a href="../blog">Blog</a>
+            <a href="https://github.com/BruceMacD">Github</a>
+            <a href="https://twitter.com/_bmacd">Twitter</a>
+        </nav>
+    </header>
+
+    <main>
+        <article>
+            <div class="post-header">
+                <h1>Fooling Facial Detection with Fashion</h1>
+                <p class="post-date">
+                    <i>
+                        <time datetime="2023-02-22T11:12Z">22 Feb, 2023</time>
+                    </i>
+                </p>
+            </div>
+
+            <div class="post-content">
+                <p>This is a <a href="https://medium.com/towards-data-science/fooling-facial-detection-with-fashion-d668ed919eb">re-post of a blog I wrote for Medium in 2019</a>. Facial detection has evolved a lot since that time, so the information here may be out of date.</p>
+
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677063377-0.webp" alt="bmacd.xyz"></p>
+
+                <div class="highlight">
+                    <pre><code>Accompanying GitHub repository: https://github.com/BruceMacD/Adversarial-Faces</code></pre>
+                </div>
+
+                <p>Usage of facial recognition is on the rise. <a href="https://www.reuters.com/article/us-amazon-com-facial-recognition/amazon-shareholders-reject-facial-recognition-ban-as-concern-grows-in-us-congress-idUSKCN1SS28I">With the recent debates over the ethics of facial recognition</a> potential adversarial attacks against facial detection have been on my mind. Facial recognition is being used everywhere from <a href="https://www.theverge.com/2019/4/18/18484581/us-airport-facial-recognition-departing-flights-biometric-exit">airports</a> to social media. It seems to be near impossible to opt-out of having your face scanned.</p>
+
+                <p>An ideal attack on facial detection would be an article of clothing that looks inconspicuous to the uninformed. With inspiration from the Hyperface project I decided to research and implement a wearable adversarial example. In this article I'll detail the process of creating an adversarial image to fool a selected type of facial detection and how I implemented a practical example on a face mask.</p>
+
+                <h2 id="facial-detection-vs-facial-recognition">Facial Detection vs. Facial Recognition</h2>
+                
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677063623-0.webp" alt="Facial Detection vs Recognition"></p>
+
+                <p>The first thing it's important to note before delving deeper into this project is the difference between facial detection and facial recognition. Facial detection refers to the ability to detect when a face is present in an image. Facial recognition relies on facial detection to establish a face is present in an image but it goes one step further and attempts to establish whose face it is.</p>
+
+                <p>For this project I have chosen to focus on facial detection. Mainly for the reason that it is much easier to test. To properly test facial recognition access to a facial recognition database would be ideal.</p>
+
+                <h2 id="facial-detection-models">Facial Detection Models</h2>
+
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677063867-0.webp" alt="Detection Models"></p>
+
+                <div class="highlight">
+                    <pre><code>import dlib
+import cv2
+cv2.imread("path/to/input_img.png")
+frontal_face_detector = dlib.get_frontal_face_detector()
+upscaling_factor = 1
+detected_faces = frontal_face_detector(img, upscaling_factor)</code></pre>
+                </div>
+
+                <h2 id="testing-the-design-on-a-mask">Testing the Design on a Mask</h2>
+
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677064217-0.webp" alt="Final Mask Design"></p>
+
+                <p>With the final design completed I created some mock mask designs to test how they were evaluated by the HOG facial detection. Initial results seemed promising. The above design consistently returned 4–5 falsely detected faces.</p>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

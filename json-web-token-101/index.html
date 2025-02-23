@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Web Token 101: Understanding Common Pitfalls | bmacd.xyz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="post">
+    <header>
+        <a class="title" href="../">
+            <h1>bmacd.xyz</h1>
+        </a>
+        <nav>
+            <a href="../">Home</a>
+            <a href="../blog">Blog</a>
+            <a href="https://github.com/BruceMacD">Github</a>
+            <a href="https://twitter.com/_bmacd">Twitter</a>
+        </nav>
+    </header>
+
+    <main>
+        <article>
+            <div class="post-header">
+                <h1>JSON Web Token 101: Understanding Common Pitfalls</h1>
+                <p class="post-date">
+                    <i>
+                        <time datetime="2023-03-25T03:09Z">24 Mar, 2023</time>
+                    </i>
+                </p>
+            </div>
+
+            <div class="post-content">
+                <blockquote>
+                    <p>Prefer a video? I gave a talk on this topic at CNCF Seattle:
+                    <a href="https://www.youtube.com/watch?v=7ybmox6KQ8c">https://www.youtube.com/watch?v=7ybmox6KQ8c</a></p>
+                </blockquote>
+
+                <p>JSON web tokens (JWTs) are prevalent in modern web applications. They are used to store authentication and information about a user. They offer a convinient way to see that a user is authenticated, but they may be overkill in some use-cases. In this blog I'll outline what JSON web tokens are and some common pitfalls to avoid.</p>
+
+                <h2 id="a-real-life-comparison">A Real Life Comparison</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679717090-0.png" alt="bmacd.xyz"></p>
+                <p>Let's start things off by talking about some physical world comparisons. If you have ever visited a bar you may have been asked for a form of identification before you could enter the bar and enjoy its facilities. Most likely you presented the bar security with your drivers license or passport. This piece of ID was created by an authority that the bar trusts such as the government or the department of motor vehicles. When this identification was created it was marked with special anti-forgery indicators that only the government that created it can easily produce. Once the bar security sees that they can trust this ID, next they will read the information written on the ID, such as your name and birthdate. Finally, they will check if this information meets their expectations, to confirm you can enter the bar. This process is actually quite similar to using a JSON web token. The ID is the JWT itself, the government organization that created the ID is similar to the JWT signer, and the bar security is the relying party that verifies a JWT before performing some action.</p>
+
+                <h2 id="what-is-a-jwt">What is a JWT?</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679714868-0.png" alt="bmacd.xyz"></p>
+                
+                <p>Yet another acronym in tech, what actually is a JWT? JWT stands for JSON web token, which is a direct name indicating the format of the token and where it is typically used.</p>
+
+                <p>JSON or "JavaScript Object Notation" is the format of a decoded JWT. If you're a web developer this should be familiar as it is a standard way to send information between a server and client. JSON lets you encode the fields of an object in a way that can easily be read and decoded.</p>
+
+                <h2 id="the-components-of-a-jwt">The Components of a JWT</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679715029-0.png" alt="bmacd.xyz"></p>
+
+                <p>So what does a JWT actually look like in reality? Well, it's a long esoteric string of random looking numbers and letters like you see here. When JWTs are being sent across the network they are sent in this form. This is 3 segments of JSON information base64 encoded separated by dots.</p>
+
+                <h2 id="what-is-a-signature">What is a Signature?</h2>
+                <p>There are 2 ways you can sign your JWTs to assure their validity, symmetrically and asymmetrically.</p>
+
+                <h3 id="symmetric-signing">Symmetric Signing</h3>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679715621-0.png" alt="bmacd.xyz"></p>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679715628-0.png" alt="bmacd.xyz"></p>
+
+                <h3 id="asymmetric-signing">Asymmetric Signing</h3>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679715798-0.png" alt="bmacd.xyz"></p>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679715805-0.png" alt="bmacd.xyz"></p>
+
+                <h2 id="the-jwt-lifecycle">The JWT Lifecycle</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679715910-0.png" alt="bmacd.xyz"></p>
+
+                <h2 id="jwt-validation">JWT Validation</h2>
+                <p>Let's create some pseudocode with our steps to verify a JWT given our current knowledge.</p>
+                <ol>
+                    <li>Separate the encoded JWT into its 3 segments.</li>
+                    <li>Decode the header and payload.</li>
+                    <li>From the header segment check which signature algorithm to use.</li>
+                    <li>Verify the signed hash matches the hash of the header and payload.</li>
+                    <li>Check if the JWT is expired.</li>
+                    <li>JWT is valid. Check if the user is authorized to perform their requested action based on the values in the JWT payload.</li>
+                </ol>
+
+                <h2 id="signature-algorithm-confusion">Signature Algorithm Confusion</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679716121-0.png" alt="bmacd.xyz"></p>
+
+                <h2 id="secret-brute-forcing">Secret Brute Forcing</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1679716447-0.png" alt="bmacd.xyz"></p>
+
+                <h2 id="store-your-jwts-securely">Store your JWTs Securely</h2>
+                <p>An increasingly common attack vector recently has been to steal or intercept a user's JWT directly rather than stealing their username and password. As 2FA is becoming more common, directly stealing the JWT allows the attacker access for the lifetime of the token without having to worry about getting the victim to approve a 2FA request.</p>
+
+                <h2 id="protect-your-secret-key">Protect your Secret Key at all Costs</h2>
+                <p>Even worse than an individual JWT being stolen would be the secret key of the JWT issuer being stolen. If this secret key is compromised then an attacker could create tokens with any authentication information they desire and these tokens would be accepted by any service that trusted this key!</p>
+
+                <h2 id="you-might-not-even-need-jwts">You Might Not Even Need JWTs</h2>
+                <p>As we have covered, JWTs are great for simple authentication and information about users in distributed systems, but that doesn't mean they are always the solution to your authentication problems. If you can use a standard stateful session token that is simply looked up in a database that may be the ideal way to handle authentication in your scenario. It's much easier to revoke stateful session tokens as it just means updating a row in the database. You can also easily update information associated with the token in the database. Make sure that the tradeoffs of statelessness are worth it in your scenario.</p>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

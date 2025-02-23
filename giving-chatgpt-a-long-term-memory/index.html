@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giving ChatGPT a Long Term Memory | bmacd.xyz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="post">
+    <header>
+        <a class="title" href="../">
+            <h1>bmacd.xyz</h1>
+        </a>
+        <nav>
+            <a href="../">Home</a>
+            <a href="../blog">Blog</a>
+            <a href="https://github.com/BruceMacD">Github</a>
+            <a href="https://twitter.com/_bmacd">Twitter</a>
+        </nav>
+    </header>
+
+    <main>
+        <article>
+            <div class="post-header">
+                <h1>Giving ChatGPT a Long Term Memory</h1>
+                <p class="post-date">
+                    <i>
+                        <time datetime="2023-05-11T06:47Z">10 May, 2023</time>
+                    </i>
+                </p>
+            </div>
+
+            <div class="post-content">
+                <blockquote>
+                    <p>You can find the complete project from this blog post here:
+                    <a href="https://github.com/BruceMacD/mnemosyne">https://github.com/BruceMacD/mnemosyne</a></p>
+                </blockquote>
+
+                <p>Like everyone else I've been leveraging ChatGPT to complete basic coding tasks. One annoyance I've been running into is gathering all the relevant information I have sent to ChatGPT in the past to give it the proper context when asking a new question.</p>
+
+                <p>After seeing <a href="https://supabase.com/blog/chatgpt-supabase-docs">Supabase's ChatGPT documentation interface</a>, I was inspired to leverage a similar combination of tools to store the context of my previous conversations. Whereas Supabase's documentation was stored in a vector database, I could instead store information from conversations with ChatGPT for future reference.</p>
+
+                <h2 id="mnemosyne-giving-context-to-chatgpt">Mnemosyne: Giving Context to ChatGPT</h2>
+                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1683785035-0.png" alt="bmacd.xyz"></p>
+
+                <p>I use a Mac, so I created a simple desktop interface to interact with ChatGPT. Before the prompt is sent to ChatGPT, I wrap the new query with some additional context that is retrieved from a vector database (Milvus) that I'm running locally in a container. The prompt that actually gets sent to ChatGPT looks like this:</p>
+
+                <blockquote>
+                    <p>Given the queries I have asked previously (in the previous section), and your replies (in the replied section), answer my new query.</p>
+                    <p>Previous section:</p>
+                    <p>(... previous queries I have sent to ChatGPT go here)</p>
+                    <p>Replied section:</p>
+                    <p>(... previous responses from ChatGPT go here)</p>
+                    <p>New query:</p>
+                    <p>(... the actual query)</p>
+                </blockquote>
+
+                <p>Overall I've found this to work quite well. ChatGPT understands the format of the prompt and doesn't reference the previous details out of context. I could see OpenAI implementing something like this in the near future, but this is a nice interface for the time being which is pretty economical since Milvus can be run locally.</p>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
