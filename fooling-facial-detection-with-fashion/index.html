@@ -65,6 +65,80 @@ upscaling_factor = 1
 detected_faces = frontal_face_detector(img, upscaling_factor)</code></pre>
                 </div>
 
+                <h2 id="histogram-of-oriented-gradients-facial-detection-in-python">Histogram of Oriented Gradients Facial Detection in Python</h2>
+                
+                <blockquote>
+                    <p><strong>Note:</strong> Expanded code samples with the functionality to display results are available on the accompanying <a href="https://github.com/BruceMacD/Adversarial-Faces">GitHub repository</a>.</p>
+                </blockquote>
+
+                <p>In order to test the examples I needed a simple HOG based facial detection implementation. Luckily the dlib library has a HOG facial detector built into its <a href="http://dlib.net/face_detector.py.html">frontal_face_detector</a>.</p>
+
+                <div class="highlight">
+                    <pre><code>import dlib
+import cv2
+cv2.imread("path/to/input_img.png")
+frontal_face_detector = dlib.get_frontal_face_detector()
+upscaling_factor = 1
+detected_faces = frontal_face_detector(img, upscaling_factor)</code></pre>
+                </div>
+
+                <p>The frontal face detector is run with an input image and an upscaling factor. The upscaling factor of 1 indicates the input image will be upscaled once. Upscaling creates a bigger image which makes it easier to detect faces. The result of the frontal face detection is a list of bounding boxes, one for each detected face.</p>
+
+                <p><img src="images/box.webp" alt="HOG Detection Box"></p>
+
+                <p>Passing the visualization of the HOG's expected input you can see that it is detected as a face. Great! We have the base for our adversarial attack.</p>
+
+                <h2 id="creating-the-adversarial-design-using-random-optimization">Creating the Adversarial Design using Random Optimization</h2>
+
+                <p>Now that I knew the visualization of the HOG's expected input will be detected as a false positive for a frontal face I needed to create a design for printing on a mask that would look inconspicuous. However there were still many factors influencing the design that I was not aware of how to optimize. The position of the faces, their orientation, and their size could all influence the amount of faces detected in an image. I could simply have tried out different designs until I found a good one, but it seemed like more fun and less tediousness to let a learning model do the hard work for me.</p>
+
+                <p>I considered several different models to find an optimal input. I researched reinforcement learning, generative adversarial networks, and Q-learning. Ultimately I decided to use simulated annealing with random optimization as it best suited my problem of finding an input that corresponded to the most faces detected by dlib.</p>
+
+                <p>I used PIL (the Python Imaging Library) in conjunction with mlrose (a Python library for random optimization) to generate an image and find the best state. Optimization with mlrose requires an initial state and a fitness function. Finding this optimal state was a very expensive computation in my case as the generated state needed to be saved to the disk as an image in order to find the number of faces detected.</p>
+
+                <div class="highlight">
+                    <pre><code># indexes:
+# 0 % 4 = pos_x
+# 1 % 4 = pos_y
+# 2 % 4 = rotation
+# 3 % 4 = scale
+initial_state = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</code></pre>
+                </div>
+
+                <p>Starting with the initial state mlrose requires a 1D array (as far as I could tell). This meant I had to use a bit of a hacky solution of giving different array positions different significance (see the index explanation). I chose to optimize an input of 6 faces as I could always replicate the design to increase its size.</p>
+
+                <div class="highlight">
+                    <pre><code>def detected_max(state):
+    # converts the 1D state array into images
+    get_img_from_state(state)
+    return len(detect_faces(cv2.imread(OUTPUT)))</code></pre>
+                </div>
+
+                <p>My fitness function was just composed of a conversion of the state to an image followed by detecting the number of faces in that image. The higher the number of faces found the better the fitness. I also tried modifying the fitness function to be higher based on the size of the input HOG face images. This may be better as the larger faces would be more likely to be detected in a real-life situation. However I found that factoring in the face size resulted in longer computation time with visually similar results.</p>
+
+                <div class="highlight">
+                    <pre><code>fitness = mlrose.CustomFitness(detected_max)
+problem = mlrose.DiscreteOpt(length=24, fitness_fn=fitness,
+                             maximize=True, max_val=scale_factor)
+schedule = mlrose.ExpDecay()
+best_state, max_faces = mlrose.simulated_annealing(problem, schedule=schedule, max_attempts=10, max_iters=1000,
+                                          init_state=initial_state, random_state=1)
+
+print('Optimal state found: ', best_state)
+print('Max fitness found: ', max_faces)
+# save the optimal found
+get_img_from_state(best_state)
+print("Number of faces in output: ", len(detect_faces(cv2.imread(OUTPUT))))</code></pre>
+                </div>
+
+                <p>With the fitness and the initial state set configuring mlrose for simulated annealing was simple. I just assigned our inputs and let it run until an optimal result was found. I ran this a few times to find a visually interesting result.</p>
+
+                <p><img src="images/generated.webp" alt="Generated Pattern"></p>
+
+                <p>Finally with this interesting output I added some finishing touches to obscure its facial design. I decided I was more qualified to do this by hand as the intent was to fool humans.</p>
+
+                <p><img src="images/filled.webp" alt="Final Pattern"></p>
+
                 <h2 id="testing-the-design-on-a-mask">Testing the Design on a Mask</h2>
 
                 <p><img src="images/mask.webp" alt="Final Mask Design"></p>
