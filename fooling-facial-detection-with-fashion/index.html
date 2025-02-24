@@ -54,7 +54,16 @@
 
                 <h2 id="facial-detection-models">Facial Detection Models</h2>
 
-                <p><img src="images/pattern" alt="Detection Models"></p>
+                <p>The next step was to choose which facial detection model to build the adversarial example against. There are many different facial detection models currently in use. There's a great primer on facial detection models and their implementations by <a href="https://www.learnopencv.com/face-detection-opencv-dlib-and-deep-learning-c-python/">Vikas Gupta on "Learn OpenCV"</a> with in-depth explanations. I'm just going to go over them briefly here.</p>
+
+                <ul>
+                    <li><strong>Deep Neural Networks (DNNs):</strong> DNNs can be trained using input data sets to detect faces in many different orientations. One popular method for DNN based facial detection is the <a href="https://arxiv.org/abs/1512.02325">single-shot-multibox detector</a>. DNNs are accurate and versatile.</li>
+                    <li><strong>Convolutional Neural Networks (CNNs):</strong> A CNN is a <a href="https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53">deep neural network designed to assign importance to different parts of an image</a>. It is robust but quite slow on a CPU.</li>
+                    <li><strong>Haar Cascade Classifiers:</strong> Haar cascades are trained using a data set with a large amount of labelled positive and negative example images. The major drawback of Haar cascade classifiers is that they can only identify faces front-on. They aren't widely used anymore as neural networks are more versatile.</li>
+                    <li><strong>Histogram of Oriented Gradients (HOG):</strong> A HOG is a facial detection method that divides a processed input image into cells with gradient orientations before feeding the result into a support vector machine. HOG detection is fast and lightweight but does not work for some unusual facial angles.</li>
+                </ul>
+
+                <p><img src="images/pattern.webp" alt="Detection Models"></p>
 
                 <div class="highlight">
                     <pre><code>import dlib
