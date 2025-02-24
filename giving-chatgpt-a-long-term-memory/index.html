@@ -42,7 +42,7 @@
                 <p>After seeing <a href="https://supabase.com/blog/chatgpt-supabase-docs">Supabase's ChatGPT documentation interface</a>, I was inspired to leverage a similar combination of tools to store the context of my previous conversations. Whereas Supabase's documentation was stored in a vector database, I could instead store information from conversations with ChatGPT for future reference.</p>
 
                 <h2 id="mnemosyne-giving-context-to-chatgpt">Mnemosyne: Giving Context to ChatGPT</h2>
-                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1683785035-0.png" alt="bmacd.xyz"></p>
+                <p><img src="images/ui.png" alt="bmacd.xyz"></p>
 
                 <p>I use a Mac, so I created a simple desktop interface to interact with ChatGPT. Before the prompt is sent to ChatGPT, I wrap the new query with some additional context that is retrieved from a vector database (Milvus) that I'm running locally in a container. The prompt that actually gets sent to ChatGPT looks like this:</p>
 

@@ -34,7 +34,7 @@
             <div class="post-content">
                 <p>This is a <a href="https://medium.com/towards-data-science/fooling-facial-detection-with-fashion-d668ed919eb">re-post of a blog I wrote for Medium in 2019</a>. Facial detection has evolved a lot since that time, so the information here may be out of date.</p>
 
-                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677063377-0.webp" alt="bmacd.xyz"></p>
+                <p><img src="images/face.webp" alt="bmacd.xyz"></p>
 
                 <div class="highlight">
                     <pre><code>Accompanying GitHub repository: https://github.com/BruceMacD/Adversarial-Faces</code></pre>
@@ -46,7 +46,7 @@
 
                 <h2 id="facial-detection-vs-facial-recognition">Facial Detection vs. Facial Recognition</h2>
                 
-                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677063623-0.webp" alt="Facial Detection vs Recognition"></p>
+                <p><img src="images/segment.webp" alt="Facial Detection vs Recognition"></p>
 
                 <p>The first thing it's important to note before delving deeper into this project is the difference between facial detection and facial recognition. Facial detection refers to the ability to detect when a face is present in an image. Facial recognition relies on facial detection to establish a face is present in an image but it goes one step further and attempts to establish whose face it is.</p>
 
@@ -54,7 +54,7 @@
 
                 <h2 id="facial-detection-models">Facial Detection Models</h2>
 
-                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677063867-0.webp" alt="Detection Models"></p>
+                <p><img src="images/pattern" alt="Detection Models"></p>
 
                 <div class="highlight">
                     <pre><code>import dlib
@@ -67,7 +67,7 @@ detected_faces = frontal_face_detector(img, upscaling_factor)</code></pre>
 
                 <h2 id="testing-the-design-on-a-mask">Testing the Design on a Mask</h2>
 
-                <p><img src="https://bear-images.sfo2.cdn.digitaloceanspaces.com/bmacd-1677064217-0.webp" alt="Final Mask Design"></p>
+                <p><img src="images/mask.webp" alt="Final Mask Design"></p>
 
                 <p>With the final design completed I created some mock mask designs to test how they were evaluated by the HOG facial detection. Initial results seemed promising. The above design consistently returned 4–5 falsely detected faces.</p>
             </div>
