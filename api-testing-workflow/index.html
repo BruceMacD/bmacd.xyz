@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚮</text></svg>">
+    <title>My API Testing Workflow | bmacd.xyz</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="post">
+    <header>
+        <a class="title" href="../">
+            <h1>bmacd.xyz</h1>
+        </a>
+        <nav>
+            <a href="../">Home</a>
+            <a href="../blog">Blog</a>
+            <a href="https://github.com/BruceMacD">Github</a>
+            <a href="https://twitter.com/_bmacd">Twitter</a>
+        </nav>
+    </header>
+
+    <main>
+        <article>
+            <div class="post-header">
+                <h1>My API Testing Workflow</h1>
+                <p class="post-date">
+                    <i>
+                        <time datetime="2024-03-11T05:24Z">11 Mar, 2024</time>
+                    </i>
+                </p>
+            </div>
+
+            <div class="post-content">
+                <p>The <a href="https://github.com/Huachao/vscode-restclient">VSCode REST Client extension</a> has made my API testing process pretty straightforward:</p>
+
+                <ol>
+                    <li>I keep a dedicated folder of <code>.http</code> files for each project, organized by functionality.</li>
+                    <li>When building new features, I create a new <code>.http</code> file or add to an existing one with the relevant endpoints.</li>
+                    <li>Using split-pane in VS Code, I code in one panel and test APIs in another without context switching.</li>
+                    <li>For different environments, I maintain a simple variables section at the top of each file.</li>
+                </ol>
+
+                <p>The stability and simplicity keep me using REST Client. There's no account to maintain, no surprise UI revamps, and no forced cloud syncing of my requests.</p>
+
+                <p>Plus, everything is just text. When I need to remember how I called that one obscure endpoint six months ago, it's right there in version control, not buried in some cloud-synced collection I can't easily search.</p>
+
+                <h2>Organizing API Requests</h2>
+
+                <p>I organize my API requests by service or functionality, creating a clean structure that's easy to navigate:</p>
+
+                <div class="highlight">
+                    <pre><code>project/
+├── auth/
+│   ├── login.http
+│   └── refresh.http
+├── users/
+│   ├── profile.http
+│   └── settings.http
+└── data/
+    └── queries.http</code></pre>
+                </div>
+
+                <p>This structure makes it easy to find related endpoints and keeps my testing organized as projects grow.</p>
+
+                <h2>Variables</h2>
+
+                <p>I define variables directly within my <code>.http</code> files using a named variables section:</p>
+
+                <div class="highlight">
+                    <pre><code># @name Variables
+@dev = https://dev-api.example.com
+@prod = https://api.example.com
+@defaultModel = llama3.2</code></pre>
+                </div>
+
+                <p>These variables can be placed anywhere in the file and referenced in subsequent requests. For sensitive information like API keys, I use <code>$dotenv</code>, to read secrets from my <code>.env</code> file which is not added to version control:</p>
+
+                <div class="highlight">
+                    <pre><code>### Auth example
+GET {{dev}}/users/me
+Authorization: Bearer {{$dotenv API_KEY}}
+
+### Using variables in request bodies
+POST {{prod}}/completions
+Content-Type: application/json
+Authorization: Bearer {{$dotenv API_KEY}}
+
+{
+  "model": "{{defaultModel}}",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ]
+}</code></pre>
+                </div>
+
+                <h2>Request Templates</h2>
+
+                <p>I create template requests that can be quickly duplicated and modified:</p>
+
+                <div class="highlight">
+                    <pre><code>### Get user profile
+GET {{dev}}/users/profile
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
+Content-Type: application/json</code></pre>
+                </div>
+
+                <p>For more complex scenarios, I can build on these templates:</p>
+
+                <div class="highlight">
+                    <pre><code>### Create new item
+POST {{dev}}/items
+Authorization: Bearer {{$dotenv AUTH_TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Test Item",
+  "description": "This is a test item",
+  "category": "testing",
+  "active": true
+}</code></pre>
+                </div>
+
+                <p>This workflow lets me iterate quickly while testing APIs, with all my example requests documented right alongside my code.</p>
+
+                <h2>Get Started</h2>
+
+                <p>If you want to see practical examples of this workflow, check out my <a href="https://github.com/BruceMacD/curl-collection">curl-collection repository</a>. It contains a variety of HTTP files for testing different APIs that you can use as a reference.</p>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
