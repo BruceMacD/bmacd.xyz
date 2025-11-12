@@ -229,6 +229,106 @@ body {
     color: #111;
 }
 
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #212121;
+        color: #e5e5e5;
+    }
+
+    .breadcrumb a {
+        color: #b3b3b3;
+    }
+
+    .breadcrumb a::after {
+        background-color: #e5e5e5;
+    }
+
+    .breadcrumb a:hover {
+        color: #e5e5e5;
+    }
+
+    .breadcrumb .discord {
+        color: #b3b3b3;
+    }
+
+    .breadcrumb .discord code {
+        background-color: #333333;
+        color: #e5e5e5;
+    }
+
+    .label {
+        color: #999999;
+    }
+
+    .intro h1 {
+        color: #e5e5e5;
+    }
+
+    .description {
+        color: #b3b3b3;
+    }
+
+    .description a {
+        color: #e5e5e5;
+        border-bottom-color: #e5e5e5;
+    }
+
+    .divider {
+        border-top-color: #444444;
+    }
+
+    .tab {
+        color: #b3b3b3;
+    }
+
+    .tab:hover {
+        background-color: #333333;
+    }
+
+    .tab.active {
+        background-color: #444444;
+        color: #e5e5e5;
+    }
+
+    .project-card {
+        border-bottom-color: #b3b3b3;
+    }
+
+    .project-content h3 {
+        color: #e5e5e5;
+    }
+
+    .project-description {
+        color: #999999;
+    }
+
+    .project-tags {
+        color: #999999;
+    }
+
+    .project-link {
+        color: #999999;
+    }
+
+    .project-link:hover {
+        color: #e5e5e5;
+    }
+
+    .contact h2 {
+        color: #e5e5e5;
+    }
+
+    .contact p {
+        color: #b3b3b3;
+    }
+
+    .contact code {
+        background-color: #333333;
+        color: #e5e5e5;
+    }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     body {
