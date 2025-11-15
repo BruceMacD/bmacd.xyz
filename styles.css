@@ -150,12 +150,23 @@ body {
     position: relative;
     padding: 1.5rem;
     border-bottom: 1px solid #444;
-    min-height: 250px;
+    min-height: 200px;
 }
 
 .project-icon {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.project-icon[src*="ollama"] {
+    width: 17px;
+    height: 17px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    display: inline-block;
 }
 
 .project-content h3 {
@@ -163,6 +174,8 @@ body {
     font-weight: 300;
     color: #111;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
 }
 
 .project-description {
@@ -297,6 +310,10 @@ body {
 
     .project-content h3 {
         color: #e5e5e5;
+    }
+
+    .project-icon {
+        filter: brightness(0) invert(1);
     }
 
     .project-description {
