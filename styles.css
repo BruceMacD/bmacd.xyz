@@ -353,13 +353,58 @@ body {
 @media (max-width: 768px) {
     body {
         padding: 2rem 1rem;
+        font-size: 1.05rem;
+    }
+
+    .container {
+        padding: 1.5rem;
+    }
+
+    .breadcrumb a {
+        font-size: 0.95rem;
+    }
+
+    .breadcrumb .discord {
+        font-size: 0.95rem;
+    }
+
+    .label {
+        font-size: 0.95rem;
+    }
+
+    .intro h1 {
+        font-size: 1.4rem;
+    }
+
+    .description {
+        font-size: 0.9rem;
     }
 
     .projects-grid {
         grid-template-columns: 1fr;
     }
 
-    .intro h1 {
+    .project-content h3 {
+        font-size: 1.05rem;
+    }
+
+    .project-description {
+        font-size: 0.9rem;
+    }
+
+    .project-tags {
+        font-size: 0.8rem;
+    }
+
+    .project-link {
+        font-size: 0.8rem;
+    }
+
+    .contact h2 {
         font-size: 1.3rem;
+    }
+
+    .contact p {
+        font-size: 0.95rem;
     }
 }
