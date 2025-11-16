@@ -3,46 +3,143 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚮</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👋</text></svg>">
     <title>bmacd.xyz</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <a class="title" href="/">
-            <h1>bmacd.xyz</h1>
-        </a>
-        <nav>
-            <a href="./">Home</a>
-            <a href="./blog">Blog</a>
+    <main class="container">
+        <nav class="breadcrumb">
             <a href="https://github.com/BruceMacD">Github</a>
+            <a href="https://www.linkedin.com/in/bruce-macdonald-683463a3/">LinkedIn</a>
             <a href="https://twitter.com/_bmacd">Twitter</a>
+            <a href="https://www.cosmos.so/bmacd">Cosmos</a>
         </nav>
-    </header>
 
-    <main>
-        <h1>ノ( º _ ºノ)</h1>
+        <header class="intro">
+            <h1>Bruce MacDonald</h1>
+            <p class="description">
+                Software developer from Canada, currently in San Francisco, working on <a href="https://www.ollama.ai/">Ollama</a>.
+            </p>
+            <p class="description">
+                Machine learning, security, decentralization, cryptography, and privacy.      
+            </p>
+        </header>
 
-        <p>I'm Bruce, a software developer from Canada. Currently I am working on <a href="https://www.ollama.ai/">Ollama</a>, a tool for running large language models. My interests include programming, security, decentralization, cryptography, AI, and electronic music.</p>
+        <div class="divider"></div>
 
-        <h1>current projects</h1>
-        <ul>
-            <li><a href="https://www.ollama.ai/">Ollama</a> - Get up and running with large language models, locally.</li>
-            <li><a href="https://chatd.ai">chatd.ai</a> - Chat with your documents using an easy to setup desktop app.</li>
-        </ul>
+        <div class="filter-tabs">
+            <button class="tab active" data-filter="all">All</button>
+            <button class="tab" data-filter="ai">AI</button>
+            <button class="tab" data-filter="security">Security</button>
+            <button class="tab" data-filter="infrastructure">Infrastructure</button>
+        </div>
 
-        <h1>past projects</h1>
-        <ul>
-            <li><a href="https://github.com/BruceMacD/Adversarial-Faces">Adversarial Faces</a> - A research project analyzing possible attack vectors against facial recognition.</li>
-            <li><a href="https://github.com/nloginhq/web">nlogin.me</a> - A password manager that keeps your email secret too using email relays.</li>
-            <li><a href="https://github.com/infrahq/infra">infra</a> - Access management for your infrastructure.</li>
-            <li><a href="https://github.com/BruceMacD/vvallet">vvallet.me</a> - Decentralized and trustless proof of online identity using your cryptocurrency wallet.</li>
-        </ul>
+        <div class="projects-grid">
+            <div class="project-card" data-tags="ai">
+                <div class="project-content">
+                    <h3><img src="public/ollama.svg" alt="Ollama" class="project-icon">Ollama</h3>
+                    <p class="project-description">Get up and running with large language models, locally.</p>
+                    <p class="project-tags">AI <span class="bullet">•</span> Open Source</p>
+                    <a href="https://www.ollama.ai/" class="project-link">Visit →</a>
+                </div>
+            </div>
 
-        <h1>contact me</h1>
-        <p>📧 hi@bmacd.xyz</p>
-        <p>👾 <code>.bmacd</code> on Discord</p>
-        <p>👔 <a href="https://www.linkedin.com/in/bruce-macdonald-683463a3/">LinkedIn</a></p>
+            <div class="project-card" data-tags="ai">
+                <div class="project-content">
+                    <h3><img src="public/chatd.svg" alt="chatd.ai" class="project-icon">chatd.ai</h3>
+                    <p class="project-description">Chat with your documents using an easy to setup desktop app.</p>
+                    <p class="project-tags">AI <span class="bullet">•</span> Desktop App</p>
+                    <a href="https://chatd.ai" class="project-link">Visit →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="security ai">
+                <div class="project-content">
+                    <h3><img src="public/face.svg" alt="Adversarial Faces" class="project-icon">Adversarial Faces</h3>
+                    <p class="project-description">A research project analyzing possible attack vectors against facial recognition.</p>
+                    <p class="project-tags">Security <span class="bullet">•</span> Research <span class="bullet">•</span> AI</p>
+                    <a href="https://github.com/BruceMacD/Adversarial-Faces" class="project-link">View →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="security">
+                <div class="project-content">
+                    <h3><img src="public/lock.svg" alt="nlogin.me" class="project-icon">nlogin.me</h3>
+                    <p class="project-description">A password manager that keeps your email secret too using email relays.</p>
+                    <p class="project-tags">Security <span class="bullet">•</span> Privacy</p>
+                    <a href="https://github.com/nloginhq/web" class="project-link">View →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="infrastructure security">
+                <div class="project-content">
+                    <h3><img src="public/infra.svg" alt="infra" class="project-icon">infra</h3>
+                    <p class="project-description">Access management for your infrastructure.</p>
+                    <p class="project-tags">Infrastructure <span class="bullet">•</span> Security</p>
+                    <a href="https://github.com/infrahq/infra" class="project-link">View →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="security">
+                <div class="project-content">
+                    <h3><img src="public/wallet.svg" alt="vvallet.me" class="project-icon">vvallet.me</h3>
+                    <p class="project-description">Decentralized and trustless proof of online identity using your cryptocurrency wallet.</p>
+                    <p class="project-tags">Crypto <span class="bullet">•</span> Identity</p>
+                    <a href="https://github.com/BruceMacD/vvallet" class="project-link">View →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="ai">
+                <div class="project-content">
+                    <h3><img src="public/cat.svg" alt="Cat Facial Detection" class="project-icon">Cat Facial Detection</h3>
+                    <p class="project-description">Detecting and mapping cat faces in images using OpenCV.</p>
+                    <p class="project-tags">AI <span class="bullet">•</span> Computer Vision</p>
+                    <a href="https://github.com/BruceMacD/Cat-Facial-Detection" class="project-link">View →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="ai">
+                <div class="project-content">
+                    <h3><img src="public/pencil.svg" alt="Stable Diffusion Prompt Generator" class="project-icon">Stable Diffusion Prompt Generator</h3>
+                    <p class="project-description">An language model for generating high-quality Stable Diffusion prompts.</p>
+                    <p class="project-tags">AI <span class="bullet">•</span> Model</p>
+                    <a href="https://ollama.com/brxce/stable-diffusion-prompt-generator" class="project-link">View →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <footer class="contact">
+            <p class="description">Email: hi@bmacd.xyz</p>
+            <p class="description">Discord: <code>.bmacd</code></p>
+        </footer>
     </main>
+
+    <script>
+        // Simple filter functionality
+        const tabs = document.querySelectorAll('.tab');
+        const cards = document.querySelectorAll('.project-card');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const filter = tab.dataset.filter;
+
+                // Filter cards
+                cards.forEach(card => {
+                    if (filter === 'all' || card.dataset.tags.includes(filter)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
