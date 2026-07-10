@@ -124,24 +124,48 @@
         const tabs = document.querySelectorAll('.tab');
         const cards = document.querySelectorAll('.project-card');
 
+        // Remove the bottom border from the last visible row of project cards.
+        // CSS :nth-last-child can't do this because it counts hidden (display:none)
+        // cards too, so a filtered grid leaves borders on the visible last row.
+        function updateLastRowBorders() {
+            cards.forEach(card => card.classList.remove('no-bottom-border'));
+            const visible = Array.from(cards).filter(card => card.style.display !== 'none');
+            if (visible.length === 0) return;
+            const maxTop = Math.max(...visible.map(card => card.offsetTop));
+            visible.forEach(card => {
+                if (card.offsetTop === maxTop) {
+                    card.classList.add('no-bottom-border');
+                }
+            });
+        }
+
+        function applyFilter(filter) {
+            cards.forEach(card => {
+                if (filter === 'all' || card.dataset.tags.includes(filter)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            updateLastRowBorders();
+        }
+
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // Update active tab
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-
-                const filter = tab.dataset.filter;
-
-                // Filter cards
-                cards.forEach(card => {
-                    if (filter === 'all' || card.dataset.tags.includes(filter)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+                applyFilter(tab.dataset.filter);
             });
         });
+
+        // Recompute on resize since the number of columns can change.
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateLastRowBorders, 100);
+        });
+
+        updateLastRowBorders();
     </script>
 </body>
 </html>

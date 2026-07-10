@@ -153,7 +153,7 @@ body {
     min-height: 200px;
 }
 
-.project-card:nth-last-child(-n+2) {
+.project-card.no-bottom-border {
     border-bottom-style: none;
 }
 
@@ -382,18 +382,6 @@ body {
 
     .description {
         font-size: 0.9rem;
-    }
-
-    .projects-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .project-card:nth-last-child(2) {
-        border-bottom-style: solid;
-    }
-
-    .project-card:last-child {
-        border-bottom-style: none;
     }
 
     .project-content h3 {
