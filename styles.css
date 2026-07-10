@@ -104,7 +104,6 @@ body {
 
 /* Divider */
 .divider {
-    border-top: 1px solid #e5e5e5;
     margin: 3rem 0;
 }
 
@@ -149,13 +148,9 @@ body {
 .project-card {
     position: relative;
     padding: 1.5rem;
-    border-bottom: 1px solid #e5e5e5;
     min-height: 200px;
 }
 
-.project-card.no-bottom-border {
-    border-bottom-style: none;
-}
 
 .project-icon {
     width: 18px;
@@ -294,10 +289,6 @@ body {
         border-bottom-color: #e5e5e5;
     }
 
-    .divider {
-        border-top-color: #444444;
-    }
-
     .tab {
         color: #b3b3b3;
     }
@@ -311,9 +302,6 @@ body {
         color: #e5e5e5;
     }
 
-    .project-card {
-        border-bottom-color: #444444;
-    }
 
     .project-content h3 {
         color: #e5e5e5;
