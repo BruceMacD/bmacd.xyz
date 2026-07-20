@@ -33,11 +33,21 @@
         <div class="filter-tabs">
             <button class="tab active" data-filter="all">All</button>
             <button class="tab" data-filter="ai">AI</button>
+            <button class="tab" data-filter="research">Research</button>
             <button class="tab" data-filter="security">Security</button>
             <button class="tab" data-filter="infrastructure">Infrastructure</button>
         </div>
 
         <div class="projects-grid">
+            <div class="project-card" data-tags="research ai">
+                <div class="project-content">
+                    <h3><img src="public/router.svg" alt="" class="project-icon">Automatic Local Model Routing</h3>
+                    <p class="project-description">Teaching an agent which requests it can send straight to a local model.</p>
+                    <p class="project-tags">Research <span class="bullet">•</span> AI</p>
+                    <a href="research/automatic-local-routing/" class="project-link">Read →</a>
+                </div>
+            </div>
+
             <div class="project-card" data-tags="ai">
                 <div class="project-content">
                     <h3><img src="public/ollama.svg" alt="Ollama" class="project-icon">Ollama</h3>
@@ -56,7 +66,7 @@
                 </div>
             </div>
 
-            <div class="project-card" data-tags="security ai">
+            <div class="project-card" data-tags="security research ai">
                 <div class="project-content">
                     <h3><img src="public/face.svg" alt="Adversarial Faces" class="project-icon">Adversarial Faces</h3>
                     <p class="project-description">A research project analyzing possible attack vectors against facial recognition.</p>
@@ -107,6 +117,15 @@
                     <p class="project-description">A language model for generating high-quality Stable Diffusion prompts.</p>
                     <p class="project-tags">AI <span class="bullet">•</span> Model</p>
                     <a href="https://ollama.com/brxce/stable-diffusion-prompt-generator" class="project-link">View →</a>
+                </div>
+            </div>
+
+            <div class="project-card" data-tags="infrastructure">
+                <div class="project-content">
+                    <h3><img src="public/worktree.svg" alt="" class="project-icon">wt</h3>
+                    <p class="project-description">Create, switch, and clean up Git worktrees with an interactive fzf-powered manager.</p>
+                    <p class="project-tags">Developer Tool <span class="bullet">•</span> Git</p>
+                    <a href="https://github.com/BruceMacD/wt" class="project-link">View →</a>
                 </div>
             </div>
         </div>

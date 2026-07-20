@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An engineering note on routing coding requests between a large reference model and a smaller local model.">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" type="image/svg+xml" href="../../public/favicon.svg">
+    <title>Teaching an agent when not to use the big model — Bruce MacDonald</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+    <main id="article" class="page-shell">
+        <nav class="site-nav" aria-label="Breadcrumb">
+            <a href="../../">Bruce MacDonald</a>
+        </nav>
+
+        <header class="article-header">
+            <h1>Teaching an agent when <em>not</em> to use the big model</h1>
+            <p class="dek">A router can learn which requests to send to a local model during normal use.</p>
+        </header>
+
+        <hr class="article-divider">
+
+        <article class="article-body">
+            <p class="lead">A capable machine sits idle on my desk most of the day while most requests my coding agent makes go out to a large cloud model. The big model has earned that role by turning high-level requests into proper implementations. But many requests are simple enough for a model running on my desk.</p>
+
+            <p>I want to put my idle hardware to work. A common approach certifies a local model against a benchmark and assigns it the tasks it passes. I do not want to rebuild that benchmark every time I swap models. I want to keep using the agent as before while the local model attempts the same requests in the background. The router can learn its strengths from that traffic and send suitable work its way. Lower API cost is a bonus, and I want to keep as much work local as the evidence allows.</p>
+
+            <p>The project comes down to one question,</p>
+
+            <blockquote>
+                <p>Can the router learn a local model's strengths from normal use and route work to it automatically?</p>
+            </blockquote>
+
+            <p>To find out, I added a router to my fork of <a href="https://github.com/BruceMacD/oh-my-pi/tree/brucemacd/routing">oh-my-pi</a>, the agent harness I use. The resulting setup keeps the reference model answering as usual while the local model tries the same request in the background, and an evaluator compares the two responses. Once enough similar attempts pass, the router lets the local model answer on its own.</p>
+
+            <aside class="note">
+                <p class="note-label">The short version</p>
+                <p>The router learns where the local model works through normal agent use. It needs no separate benchmark and never changes model weights.</p>
+            </aside>
+
+            <section id="basic-loop">
+                <p class="section-number" aria-hidden="true">01</p>
+                <h2>The basic loop</h2>
+
+                <p>The loop uses four models, with three generating outputs and one producing embeddings.</p>
+
+                <div class="roles" role="list">
+                    <div role="listitem">
+                        <p class="role-name"><span class="role-dot"></span>Reference model</p>
+                        <p class="role-description">The large model that answers while the router collects evidence.</p>
+                    </div>
+                    <div role="listitem">
+                        <p class="role-name"><span class="role-dot"></span>Local model</p>
+                        <p class="role-description">The local model under test and, later, allowed to answer.</p>
+                    </div>
+                    <div role="listitem">
+                        <p class="role-name"><span class="role-dot"></span>Evaluator</p>
+                        <p class="role-description">The model that compares both proposed actions.</p>
+                    </div>
+                    <div role="listitem">
+                        <p class="role-name"><span class="role-dot"></span>Embedding model</p>
+                        <p class="role-description">A local model that maps each request to a retrieval vector.</p>
+                    </div>
+                </div>
+
+                <figure class="diagram" aria-labelledby="shadow-caption">
+                    <p class="diagram-label">Router shadow mode</p>
+                    <div class="shadow-flow">
+                        <div class="flow-node request-node">
+                            <span class="node-index">A</span>
+                            <strong>Canonical request</strong>
+                            <small>one untouched context</small>
+                        </div>
+                        <div class="flow-split" aria-hidden="true"><span></span><span></span></div>
+                        <div class="parallel-paths">
+                            <div class="path">
+                                <div class="flow-node accent-node"><strong>Reference model</strong><small>authoritative stream</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>Reference response</strong><small>the result the agent trusts</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>Normal agent path</strong><small>shown to the user; tools execute</small></div>
+                            </div>
+                            <div class="path">
+                                <div class="flow-node accent-node"><strong>Local model</strong><small>bounded background copy</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>Local response</strong><small>not executed while the router shadows</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>Evaluator</strong><small>grades it against the reference</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>SQLite dataset</strong><small>grade + outputs + vector</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <figcaption id="shadow-caption"><span>Figure 1.</span> The reference response follows the normal agent path and can execute tools. The evaluator grades the local response and the router stores it as routing evidence.</figcaption>
+                </figure>
+
+                <p>From the user's point of view, nothing changes. The reference model's stream goes back to the agent as usual while the local model works in the background. Each shadow example records the request, both outputs, their latencies, the request embedding, and the evaluator's grade. If the local model proposes tool calls, the router records them but never runs them.</p>
+
+                <p>The evaluator returns a structured verdict rather than free text, so every comparison lands in the dataset in the same shape.</p>
+
+                <div class="code-card" aria-label="Example evaluator output">
+                    <div class="code-header"><span>evaluator-output.json</span><span>structured evidence</span></div>
+                    <pre><code>{
+  <span class="token-key">"verdict"</span>: <span class="token-value">"pass"</span>,
+  <span class="token-key">"confidence"</span>: <span class="token-value">1</span>,
+  <span class="token-key">"unsafeAction"</span>: <span class="token-value">false</span>,
+  <span class="token-key">"riskClass"</span>: <span class="token-value">"response"</span>,
+  <span class="token-key">"taskClass"</span>: <span class="token-value">"arithmetic"</span>,
+  <span class="token-key">"reasonCodes"</span>: [
+    <span class="token-value">"correct_answer"</span>,
+    <span class="token-value">"matches_reference_intent"</span>
+  ],
+  <span class="token-key">"acceptableNextAction"</span>: <span class="token-value">true</span>
+}</code></pre>
+                </div>
+            </section>
+
+            <section id="retrieval">
+                <p class="section-number" aria-hidden="true">02</p>
+                <h2>Routing as retrieval</h2>
+
+                <p>The router's shadow mode produces a growing dataset of graded attempts. To use that evidence, the router predicts whether the local model will succeed on a new request through retrieval. It turns each incoming request into a vector and matches it against the vectors of past shadow examples. I chose <code>embeddinggemma</code> for this role and stored its vectors in SQLite.</p>
+
+                <p>Unlike a retrieval augmented generation workflow, the retrieved outputs never enter the model prompt. Their labels estimate whether the local model will succeed on the request at hand.</p>
+
+                <p>Before any similarity math, the router requires an exact compatibility cohort with matching values for the following fields.</p>
+
+                <ul class="check-list">
+                    <li>same reference model, local model, evaluator, and embedding model</li>
+                    <li>same local model version</li>
+                    <li>same system prompt fingerprint</li>
+                    <li>same tool schema fingerprint.</li>
+                </ul>
+
+                <p>Within a cohort, the router keeps the neighbors above a cosine similarity threshold. It keeps both passes and failures, so past mistakes count as much as past successes, and it combines the surviving neighbors into a similarity-weighted pass rate.</p>
+
+                <div class="equation" role="img" aria-label="Weighted p hat equals the sum of similarity times outcome divided by the sum of similarity">
+                    <span class="equation-label">Similarity weighted pass rate</span>
+                    <div><i>p̂</i><sub>w</sub> = <span class="fraction"><span>Σ <i>s</i><sub>i</sub><i>y</i><sub>i</sub></span><span>Σ <i>s</i><sub>i</sub></span></span></div>
+                </div>
+
+                <p>Here, <i>s</i><sub>i</sub> is each retrieved example's cosine similarity to the current request, and <i>y</i><sub>i</sub> is 1 when the evaluator judged the local output correct, safe, and usable, and 0 otherwise. Because the sums run over all retrieved examples, closer matches carry more weight in the result.</p>
+
+                <p>A raw pass rate misleads with small samples. One success in one trial gives 100% with almost no evidence behind it. Instead of trusting <i>p̂</i><sub>w</sub> on its own, the router computes a 95% Wilson lower bound over an effective sample size derived from the similarity weights.</p>
+
+                <div class="equation" role="img" aria-label="Effective sample size equals the square of summed similarity divided by the sum of squared similarity">
+                    <span class="equation-label">Effective sample size</span>
+                    <div><i>n</i><sub>eff</sub> = <span class="fraction"><span>(Σ <i>s</i><sub>i</sub>)²</span><span>Σ <i>s</i><sub>i</sub>²</span></span></div>
+                </div>
+
+                <p>The result, <i>n</i><sub>eff</sub>, represents the number of equally weighted examples in the retrieved evidence. When every match has the same weight, it equals the raw count. When a few close matches dominate, it is smaller. The router uses this value in place of the raw neighbor count when calculating the bound.</p>
+
+                <p>The Wilson lower bound is a conservative estimate of the local model's true success rate. It gives the lowest rate consistent with the observed results and the sample size. With a few examples it stays well below the raw pass rate, and it rises as more successful evidence accumulates.</p>
+
+                <div class="number-strip" aria-label="Confidence examples">
+                    <div><strong>20.65%</strong><span>lower bound after 1 perfect neighbor</span></div>
+                    <div><strong>30.1%</strong><span>lower bound after 3 passes in 4 trials</span></div>
+                    <div><strong>≈189</strong><span>perfect equal weight examples to clear 98%</span></div>
+                </div>
+            </section>
+
+            <section id="automatic-path">
+                <p class="section-number" aria-hidden="true">03</p>
+                <h2>Automatic routing</h2>
+
+                <p>With a conservative confidence estimate for every request, the router can act on the evidence. When the router runs in automatic mode, it chooses a model before generation, and uses it for the inference step.</p>
+
+                <figure class="diagram" aria-labelledby="decision-caption">
+                    <p class="diagram-label">Router automatic mode</p>
+                    <div class="decision-flow">
+                        <div class="flow-node wide"><strong>Incoming request</strong><small>embed + retrieve compatible pass and fail rows</small></div>
+                        <div class="vertical-arrow" aria-hidden="true">↓</div>
+                        <div class="decision-node"><strong>Enough evidence?</strong><small>neighbors + Wilson lower bound</small></div>
+                        <div class="decision-branches">
+                            <div class="branch">
+                                <span class="branch-label">No / holdout</span>
+                                <div class="flow-node accent-node"><strong>Reference model + shadow</strong><small>collect another label</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>Update evidence</strong></div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Yes</span>
+                                <div class="flow-node accent-node"><strong>Stream local model</strong><small>directly to the agent</small></div>
+                                <div class="vertical-arrow" aria-hidden="true">↓</div>
+                                <div class="flow-node"><strong>Normal agent path</strong><small>text and tool calls</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <figcaption id="decision-caption"><span>Figure 2.</span> The evidence gate decides whether the local model becomes authoritative for this inference step.</figcaption>
+                </figure>
+
+                <p>On a local win, the router streams the local model's response and never queries the reference model. The evidence gate is the system's trust boundary, and the router's automatic mode moves suitable work onto local hardware.</p>
+
+                <aside class="note">
+                    <p class="note-label">A representation boundary</p>
+                    <p>The coding agent prepares provider-specific tool context before the router runs. Requests whose context uses a provider's own in-band tool dialect stay on the reference model, because that representation only makes sense to the model that owns it.</p>
+                </aside>
+            </section>
+
+            <section id="evaluation">
+                <p class="section-number" aria-hidden="true">04</p>
+                <h2>A small evaluation</h2>
+
+                <p>With the loop in place, I ran it end to end using the following models.</p>
+
+                <div class="model-stack" aria-label="Models used in evaluation">
+                    <div><span>Reference model</span><code>ollama/glm-5.2:cloud</code></div>
+                    <div><span>Local model</span><code>ollama/ornith:35b</code></div>
+                    <div><span>Evaluator</span><code>ollama/glm-5.2:cloud</code></div>
+                    <div><span>Embedding model</span><code>ollama/embeddinggemma:latest</code></div>
+                </div>
+
+                <aside class="note">
+                    <p class="note-label">Read this as an integration proof</p>
+                    <p>Three comparisons from the router's shadow mode checked the integration. This sample cannot estimate local model accuracy.</p>
+                </aside>
+
+                <p>The exact text check asked both models to reply with a specific piece of text and nothing else, and the two arithmetic checks used the prompt <code>What is 2+2? Reply with just the number.</code> A pass means the evaluator judged that the local response could have replaced the reference response for that request.</p>
+
+                <div class="table-wrap" role="region" aria-label="Shadow evaluation results" tabindex="0">
+                    <table>
+                        <caption>Three comparisons collected in the router's shadow mode with Ornith 35B</caption>
+                        <thead>
+                            <tr><th scope="col">Check</th><th scope="col">Reference latency</th><th scope="col">Local latency</th><th scope="col">Evaluator latency</th><th scope="col">Verdict</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Exact text</td><td>1.046 s</td><td>18.082 s</td><td>4.812 s</td><td><span class="verdict">Fail</span></td></tr>
+                            <tr><td>Arithmetic, first comparison</td><td>0.988 s</td><td>10.454 s</td><td>1.746 s</td><td><span class="verdict">Pass</span></td></tr>
+                            <tr><td>Arithmetic, evidence collection</td><td>5.065 s</td><td>17.104 s</td><td>1.794 s</td><td><span class="verdict">Pass</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="metric-grid">
+                    <div><span>Router shadow pass rate</span><strong>66.7%</strong><small>2 of 3</small></div>
+                    <div><span>95% lower bound</span><strong>20.8%</strong><small>Wilson interval</small></div>
+                    <div><span>Median reference</span><strong>1.046s</strong><small>generation latency</small></div>
+                    <div><span>Median local</span><strong>17.104s</strong><small>shadow latency</small></div>
+                    <div><span>Median evaluator</span><strong>1.794s</strong><small>label latency</small></div>
+                </div>
+
+                <p>In the failed check, <code>ornith:35b</code> decided that a request to repeat a specific piece of text verbatim looked like prompt injection, and refused. The evaluator returned <code>fail</code> with 0.95 confidence and tagged the codes <code>refused_benign_request</code> and <code>did_not_preserve_intent</code>. The local model failed on judgment here, not capability.</p>
+
+                <p>The two arithmetic runs differed in one detail. The first comparison ran before the router had an embedding for the request, so its pass could not serve as routing evidence. The evidence collection run repeated the same comparison with an embedding attached, and that stored example enabled the automatic routing test below.</p>
+
+                <h3>Did it use the local model when appropriate?</h3>
+
+                <p>I built the system toward this moment, a request that never touches the big model. To force it with three examples, I lowered the confidence threshold to 0.20 and required a single neighbor. These settings are unsafe for normal use, but fine for a proof of control.</p>
+
+                <p>The sequence ran as designed. The evidence collection request used the reference model, the local model matched it, the evaluator passed it, and the router stored the embedding. The next identical request found that neighbor with weight 1.0, for a Wilson lower bound of 0.2065, just above the test threshold, and the router streamed the local model.</p>
+
+                <div class="proof-card">
+                    <div class="proof-heading">
+                        <span class="status-light" aria-hidden="true"></span>
+                        <div><p>Router selected the local model</p><strong>The reference model was not called.</strong></div>
+                    </div>
+                    <div class="proof-stats">
+                        <div><span>Route</span><strong>local</strong></div>
+                        <div><span>Neighbors</span><strong>1</strong></div>
+                        <div><span>Weighted pass</span><strong>1.0</strong></div>
+                        <div><span>Lower bound</span><strong>0.2065</strong></div>
+                        <div><span>Local latency</span><strong>1.923 s</strong></div>
+                        <div><span>Reference latency</span><strong>null</strong></div>
+                        <div><span>Evaluator latency</span><strong>null</strong></div>
+                        <div><span>Answer</span><strong>4</strong></div>
+                    </div>
+                </div>
+
+                <p>Even warm, the local model remained slower than the median cloud reference, so this run proved local routing and control rather than lower latency. It also confirmed that matching text alone does not join a cohort. In a later replay, new MCP tools changed both fingerprints, the reference model ran again, and the local model became eligible after a fresh pass under the new fingerprints.</p>
+            </section>
+
+            <section id="limitations">
+                <p class="section-number" aria-hidden="true">05</p>
+                <h2>Limitations</h2>
+
+                <p>A three-example proof makes the limitations easy to see. The largest is the core assumption that retrieval routing works when similar requests have similar outcomes. That holds for repeated extraction, classification, formatting, and narrow coding tasks, but it may break down on agent work where a small change to the input alters the entire tool plan.</p>
+
+                <p>Beyond that assumption, the current implementation has clear gaps.</p>
+
+                <ul class="limitations-list">
+                    <li><strong>No guard after routing.</strong><span>The router's automatic mode trusts the selected local model and does not retry the reference model.</span></li>
+                    <li><strong>No automatic canary ramp.</strong><span>Cohort promotion and demotion are not adaptive yet.</span></li>
+                    <li><strong>No context preflight.</strong><span>Context length and repeated loops need explicit guards.</span></li>
+                    <li><strong>Linear retrieval.</strong><span>The router scans every stored vector in SQLite.</span></li>
+                    <li><strong>Fallible labels.</strong><span>Evaluator decisions inherit the evaluator model’s errors.</span></li>
+                    <li><strong>No local model training.</strong><span>The router only learns where an existing model works.</span></li>
+                </ul>
+
+                <p>The exact fingerprints cut both ways. They protect against schema drift, but they split the dataset. My replay showed this when new MCP tools moved identical request text into a fresh cohort with no evidence. An agent configuration that changes often could take a long time to collect the 189 or so close, successful examples needed to clear a 98% bound.</p>
+
+                <blockquote class="closing-quote">
+                    <p>Use the reference model to learn. Use the evidence to move as much suitable work as possible onto local hardware.</p>
+                </blockquote>
+            </section>
+
+            <section id="final-thoughts">
+                <p class="section-number" aria-hidden="true">06</p>
+                <h2>What I learned</h2>
+
+                <p>I first described this system to myself as “RAG over the success dataset,” but that name undersells the failures, which matter as much. The useful signal is the full pattern of passes, failures, uncertain results, and unsafe actions under one model and tool contract. Retrieval selects the evidence, the confidence bound measures it, and the resulting route decides which model the agent trusts.</p>
+
+                <p>With automatic distillation, a team collects reference model outputs, trains a smaller model on them, and shifts traffic to it (<a href="https://inference.net/products/train/">Inference.net, “Train: fine-tuning and distillation.”</a>). Distillation produces a less flexible artifact, a new set of weights that someone must train and deploy, with the learning spread through those weights. That makes it hard to inspect why the system trusts a given request, or to limit that trust to a small group of similar requests. This router leaves both models unchanged and expands local use one group of similar requests at a time; anything outside the evidence still goes to the reference model.</p>
+
+                <p>That contrast suggests an order, with routing making a local model useful before any fine tuning happens. First learn where it works; later, train a new version on the accepted reference model examples and the local model's failures.</p>
+
+                <p>The experiment ended with the idle machine on my desk answering a request the big model never saw. That is a system check rather than a benchmark, but it demonstrates the whole loop.</p>
+
+                <div class="loop-statement" aria-label="Observe, label, retrieve, route, and run locally">
+                    <span>Observe</span><i>→</i><span>Label</span><i>→</i><span>Retrieve</span><i>→</i><span>Route</span><i>→</i><span>Run locally</span>
+                </div>
+            </section>
+
+        </article>
+
+        <footer class="site-footer">
+            <a href="#article">Back to top ↑</a>
+        </footer>
+    </main>
+</body>
+</html>
