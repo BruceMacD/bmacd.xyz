@@ -793,6 +793,10 @@ th {
 }
 
 @media (max-width: 720px) {
+    .reading-progress {
+        display: none;
+    }
+
     body {
         padding: 2rem 1rem 0;
     }
