@@ -409,6 +409,10 @@ body {
 /* Responsive design — font sizes scale fluidly via the root clamp(),
    so only spacing needs adjusting on small screens. */
 @media (max-width: 768px) {
+    .tab[data-filter="infrastructure"] {
+        display: none;
+    }
+
     body {
         padding: 2rem 1rem;
     }
