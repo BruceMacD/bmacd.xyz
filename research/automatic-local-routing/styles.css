@@ -639,7 +639,7 @@ th {
 
 .metric-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     margin: 2.5rem 0;
     border-top: 1px solid var(--line);
 }
@@ -651,7 +651,7 @@ th {
     border-bottom: 1px solid var(--line);
 }
 
-.metric-grid > div:not(:nth-child(3n)) {
+.metric-grid > div:nth-child(odd) {
     border-right: 1px solid var(--line);
 }
 
@@ -703,7 +703,7 @@ th {
 
 .proof-stats {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .proof-stats div {
@@ -713,7 +713,7 @@ th {
     border-top: 1px solid var(--line);
 }
 
-.proof-stats div:not(:nth-child(4n)) {
+.proof-stats div:not(:nth-child(3n)) {
     border-right: 1px solid var(--line);
 }
 
@@ -852,23 +852,11 @@ th {
         border-left: 0;
     }
 
-    .metric-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .metric-grid > div:not(:nth-child(3n)) {
-        border-right: 0;
-    }
-
-    .metric-grid > div:nth-child(odd) {
-        border-right: 1px solid var(--line);
-    }
-
     .proof-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .proof-stats div:not(:nth-child(4n)) {
+    .proof-stats div:nth-child(n) {
         border-right: 0;
     }
 
