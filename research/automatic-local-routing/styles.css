@@ -160,6 +160,20 @@ h1 em {
     min-width: 0;
 }
 
+.router-hero {
+    width: min(36rem, calc(100vw - 2rem));
+    margin: 0 auto 3rem;
+}
+
+.router-hero canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--background);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
 .article-body p {
     margin: 1.35rem 0;
 }
@@ -806,9 +820,14 @@ th {
     }
 
     .diagram,
-    .table-wrap {
+    .table-wrap,
+    .router-hero {
         width: calc(100vw - 2rem);
         margin-left: 0;
+    }
+
+    .router-hero {
+        margin-bottom: 2rem;
     }
 
     .roles {

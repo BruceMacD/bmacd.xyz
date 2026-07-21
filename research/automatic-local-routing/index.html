@@ -26,6 +26,126 @@
         <hr class="article-divider">
 
         <article class="article-body">
+            <figure class="router-hero">
+                <canvas id="c" width="240" height="120" role="img" aria-label="A coding request passes through a router and follows the active path to a local model instead of the cloud model."></canvas>
+                <script>
+                (() => {
+                  const ctx = document.getElementById('c').getContext('2d');
+                  const styles = getComputedStyle(document.documentElement);
+                  const BACKGROUND = styles.getPropertyValue('--background').trim();
+                  const FOREGROUND = styles.getPropertyValue('--text').trim();
+
+                  ctx.fillStyle = BACKGROUND;
+                  ctx.fillRect(0, 0, 240, 120);
+
+                  const FAINT = 0.16;   // inactive (cloud) route
+                  const DIM   = 0.42;   // active route dots
+                  const MID   = 0.65;   // outlines
+
+                  const put = (x, y, a = 1) => {
+                    ctx.globalAlpha = a;
+                    ctx.fillStyle = FOREGROUND;
+                    ctx.fillRect(x, y, 1, 1);
+                    ctx.globalAlpha = 1;
+                  };
+                  const rect = (x, y, w, h, a = 1) => {
+                    ctx.globalAlpha = a;
+                    ctx.fillStyle = FOREGROUND;
+                    ctx.fillRect(x, y, w, h);
+                    ctx.globalAlpha = 1;
+                  };
+                  const outline = (x, y, w, h, a = 1) => {
+                    rect(x, y, w, 1, a); rect(x, y + h - 1, w, 1, a);
+                    rect(x, y, 1, h, a); rect(x + w - 1, y, 1, h, a);
+                  };
+                  const blit = (bitmap, x, y, a = 1) => {
+                    bitmap.forEach((row, r) => {
+                      for (let c = 0; c < row.length; c++)
+                        if (row[c] === 'X') put(x + c, y + r, a);
+                    });
+                  };
+
+                  // ------------- icons -------------
+                  const CLOUD = [
+                    '........XXXXXX..........',
+                    '......XX......XX........',
+                    '.....X..........X.......',
+                    '...XX............X......',
+                    '..X...............XX....',
+                    '.X..................XX..',
+                    'X.....................X.',
+                    'X.....................X.',
+                    '.XXXXXXXXXXXXXXXXXXXXXX.',
+                  ];
+
+                  function diamond(cx, cy, r, a) {
+                    for (let dx = -r; dx <= r; dx++) {
+                      const dy = r - Math.abs(dx);
+                      put(cx + dx, cy + dy, a);
+                      put(cx + dx, cy - dy, a);
+                    }
+                  }
+
+                  function terminal(x, y) {
+                    // 30x22 window, chamfered corners, "> _" prompt
+                    outline(x, y, 30, 22, MID);
+                    ctx.fillStyle = BACKGROUND;
+                    for (const [cx, cy] of [[x, y], [x + 29, y], [x, y + 21], [x + 29, y + 21]])
+                      ctx.fillRect(cx, cy, 1, 1);
+                    blit(['X...', '.X..', '..X.', '.X..', 'X...'], x + 6, y + 8);
+                    rect(x + 13, y + 8, 4, 5, 1);
+                  }
+
+                  function chip(x, y) {
+                    // 22x22: body, lit die, 3 pins per side
+                    outline(x + 4, y + 4, 14, 14, 0.85);
+                    rect(x + 9, y + 9, 4, 4, 1);
+                    for (const i of [6, 10, 14]) {
+                      rect(x + 1,  y + i, 3, 1, MID);
+                      rect(x + 18, y + i, 3, 1, MID);
+                      rect(x + i, y + 1,  1, 3, MID);
+                      rect(x + i, y + 18, 1, 3, MID);
+                    }
+                  }
+
+                  const chevron = (x, y, a) =>
+                    blit(['X..', '.X.', '..X', '.X.', 'X..'], x, y - 2, a);
+
+                  // ------------- paths (dot every 4px along manhattan polyline) -------------
+                  function dots(points, a) {
+                    for (let i = 0; i < points.length - 1; i++) {
+                      const [x1, y1] = points[i], [x2, y2] = points[i + 1];
+                      const steps = Math.abs(x2 - x1) + Math.abs(y2 - y1);
+                      for (let j = 0; j <= steps; j += 4) {
+                        const t = steps ? j / steps : 0;
+                        put(Math.round(x1 + (x2 - x1) * t), Math.round(y1 + (y2 - y1) * t), a);
+                      }
+                    }
+                  }
+
+                  // packet frozen mid-flight: 3x3 head + stepped fading trail
+                  const packet = (pts) => pts.forEach(([x, y, a]) => rect(x - 1, y - 1, 3, 3, a));
+
+                  // ------------- layout -------------
+                  terminal(14, 49);                 // coding agent
+                  diamond(110, 60, 8, MID);         // router (decision)
+                  blit(CLOUD, 194, 22, 0.45);       // cloud (inactive route)
+                  chip(194, 79);                    // local (active route)
+
+                  dots([[46, 60], [99, 60]], DIM);
+                  dots([[121, 60], [172, 60], [172, 90], [190, 90]], DIM);     // -> local
+                  dots([[121, 60], [172, 60], [172, 26], [190, 26]], FAINT);   // -> cloud
+
+                  chevron(94, 60, DIM);
+                  chevron(185, 90, DIM);
+                  chevron(185, 26, FAINT);
+
+                  packet([[72, 60, 1], [68, 60, 0.45], [64, 60, 0.18]]);
+                  packet([[172, 82, 1], [172, 78, 0.45], [172, 74, 0.18]]);
+                })();
+                </script>
+            </figure>
+
             <p class="lead">A capable machine sits idle on my desk most of the day while most requests my coding agent makes go out to a large cloud model. The big model has earned that role by turning high-level requests into proper implementations. But many requests are simple enough for a model running on my desk.</p>
 
             <p>I want to put my idle hardware to work. A common approach certifies a local model against a benchmark and assigns it the tasks it passes. I do not want to rebuild that benchmark every time I swap models. I want to keep using the agent as before while the local model attempts the same requests in the background. The router can learn its strengths from that traffic and send suitable work its way. Lower API cost is a bonus, and I want to keep as much work local as the evidence allows.</p>
