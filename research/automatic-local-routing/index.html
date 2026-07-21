@@ -361,7 +361,6 @@
                     <div><span>95% lower bound</span><strong>20.8%</strong><small>Wilson interval</small></div>
                     <div><span>Median reference</span><strong>1.046s</strong><small>generation latency</small></div>
                     <div><span>Median local</span><strong>17.104s</strong><small>shadow latency</small></div>
-                    <div><span>Median evaluator</span><strong>1.794s</strong><small>label latency</small></div>
                 </div>
 
                 <p>In the failed check, <code>ornith:35b</code> decided that a request to repeat a specific piece of text verbatim looked like prompt injection, and refused. The evaluator returned <code>fail</code> with 0.95 confidence and tagged the codes <code>refused_benign_request</code> and <code>did_not_preserve_intent</code>. The local model failed on judgment here, not capability.</p>
@@ -385,8 +384,6 @@
                         <div><span>Weighted pass</span><strong>1.0</strong></div>
                         <div><span>Lower bound</span><strong>0.2065</strong></div>
                         <div><span>Local latency</span><strong>1.923 s</strong></div>
-                        <div><span>Reference latency</span><strong>null</strong></div>
-                        <div><span>Evaluator latency</span><strong>null</strong></div>
                         <div><span>Answer</span><strong>4</strong></div>
                     </div>
                 </div>
