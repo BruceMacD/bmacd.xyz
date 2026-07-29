@@ -276,12 +276,6 @@
                 <p>The result, <i>n</i><sub>eff</sub>, represents the number of equally weighted examples in the retrieved evidence. When every match has the same weight, it equals the raw count. When a few close matches dominate, it is smaller. The router uses this value in place of the raw neighbor count when calculating the bound.</p>
 
                 <p>The Wilson lower bound is a conservative estimate of the local model's true success rate. It gives the lowest rate consistent with the observed results and the sample size. With a few examples it stays well below the raw pass rate, and it rises as more successful evidence accumulates.</p>
-
-                <div class="number-strip" aria-label="Confidence examples">
-                    <div><strong>20.65%</strong><span>lower bound after 1 perfect neighbor</span></div>
-                    <div><strong>30.1%</strong><span>lower bound after 3 passes in 4 trials</span></div>
-                    <div><strong>≈189</strong><span>perfect equal weight examples to clear 98%</span></div>
-                </div>
             </section>
 
             <section id="automatic-path">
@@ -356,13 +350,6 @@
                     </table>
                 </div>
 
-                <div class="metric-grid">
-                    <div><span>Router shadow pass rate</span><strong>66.7%</strong><small>2 of 3</small></div>
-                    <div><span>95% lower bound</span><strong>20.8%</strong><small>Wilson interval</small></div>
-                    <div><span>Median reference</span><strong>1.046s</strong><small>generation latency</small></div>
-                    <div><span>Median local</span><strong>17.104s</strong><small>shadow latency</small></div>
-                </div>
-
                 <p>In the failed check, <code>ornith:35b</code> decided that a request to repeat a specific piece of text verbatim looked like prompt injection, and refused. The evaluator returned <code>fail</code> with 0.95 confidence and tagged the codes <code>refused_benign_request</code> and <code>did_not_preserve_intent</code>. The local model failed on judgment here, not capability.</p>
 
                 <p>The two arithmetic runs differed in one detail. The first comparison ran before the router had an embedding for the request, so its pass could not serve as routing evidence. The evidence collection run repeated the same comparison with an embedding attached, and that stored example enabled the automatic routing test below.</p>
@@ -372,21 +359,6 @@
                 <p>I built the system toward this moment, a request that never touches the big model. To force it with three examples, I lowered the confidence threshold to 0.20 and required a single neighbor. These settings are unsafe for normal use, but fine for a proof of control.</p>
 
                 <p>The sequence ran as designed. The evidence collection request used the reference model, the local model matched it, the evaluator passed it, and the router stored the embedding. The next identical request found that neighbor with weight 1.0, for a Wilson lower bound of 0.2065, just above the test threshold, and the router streamed the local model.</p>
-
-                <div class="proof-card">
-                    <div class="proof-heading">
-                        <span class="status-light" aria-hidden="true"></span>
-                        <div><p>Router selected the local model</p><strong>The reference model was not called.</strong></div>
-                    </div>
-                    <div class="proof-stats">
-                        <div><span>Route</span><strong>local</strong></div>
-                        <div><span>Neighbors</span><strong>1</strong></div>
-                        <div><span>Weighted pass</span><strong>1.0</strong></div>
-                        <div><span>Lower bound</span><strong>0.2065</strong></div>
-                        <div><span>Local latency</span><strong>1.923 s</strong></div>
-                        <div><span>Answer</span><strong>4</strong></div>
-                    </div>
-                </div>
 
                 <p>Even warm, the local model remained slower than the median cloud reference, so this run proved local routing and control rather than lower latency. It also confirmed that matching text alone does not join a cohort. In a later replay, new MCP tools changed both fingerprints, the reference model ran again, and the local model became eligible after a fresh pass under the new fingerprints.</p>
             </section>
