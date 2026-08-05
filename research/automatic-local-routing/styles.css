@@ -2,7 +2,6 @@
 :root {
     color-scheme: light dark;
     --background: #fff;
-    --surface: #f6f6f4;
     --surface-strong: #ededeb;
     --text: #111;
     --text-soft: #555;
@@ -115,7 +114,6 @@ a:hover {
     border-top: 1px solid var(--line);
 }
 
-.section-number,
 .note-label,
 .diagram-label,
 .equation-label {
@@ -184,13 +182,7 @@ h1 em {
 }
 
 .article-body section {
-    position: relative;
     margin-top: 4rem;
-}
-
-.section-number {
-    margin-bottom: 0.8rem;
-    font-family: var(--mono);
 }
 
 h2 {
@@ -214,12 +206,12 @@ code {
 }
 
 blockquote {
-    margin: 2.5rem 0;
-    padding: 0.2rem 0 0.2rem 1.25rem;
-    border-left: 2px solid var(--line-strong);
-    color: var(--text-soft);
-    font-size: 1.2rem;
+    margin: 3rem 0;
+    color: var(--text);
+    font-size: 1.15rem;
+    font-style: italic;
     line-height: 1.55;
+    text-align: center;
 }
 
 blockquote p {
@@ -227,20 +219,22 @@ blockquote p {
 }
 
 .note {
+    display: grid;
+    grid-template-columns: minmax(6rem, 9rem) 1fr;
+    gap: 0.25rem 1.5rem;
+    align-items: baseline;
     margin: 2.5rem 0;
-    padding: 1.25rem 1.35rem;
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--line-strong);
-    background: var(--surface);
+    font-size: 0.92rem;
+    line-height: 1.55;
 }
 
-.note-label {
-    margin: 0 0 0.35rem !important;
-    color: var(--text);
-}
-
-.note p:last-child {
+.note .note-label {
     margin: 0;
+}
+
+.note p {
+    margin: 0;
+    color: var(--text-soft);
 }
 
 .roles {
@@ -260,35 +254,20 @@ blockquote p {
 }
 
 .role-name {
-    display: flex;
-    gap: 0.55rem;
-    align-items: center;
     margin: 0 !important;
     font-size: 0.88rem;
     font-weight: 400;
 }
 
 .role-description {
-    margin: 0.45rem 0 0 1.1rem !important;
+    margin: 0.45rem 0 0 !important;
     color: var(--text-soft);
     font-size: 0.88rem;
     line-height: 1.45;
 }
 
-.role-dot {
-    flex: 0 0 auto;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--line-strong);
-}
-
 .diagram {
-    width: min(52rem, calc(100vw - 2rem));
-    margin: 3rem 0 3rem clamp(-5rem, -7vw, 0rem);
-    padding: clamp(1.1rem, 4vw, 2.25rem);
-    border: 1px solid var(--line);
-    background: var(--surface);
+    margin: 3rem 0;
 }
 
 .diagram-label {
@@ -296,18 +275,10 @@ blockquote p {
 }
 
 .diagram figcaption {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--line);
+    margin-top: 1.5rem;
     color: var(--text-soft);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     line-height: 1.5;
-}
-
-.diagram figcaption span {
-    color: var(--text);
-    font-weight: 400;
-    text-transform: uppercase;
 }
 
 .shadow-flow,
@@ -321,56 +292,39 @@ blockquote p {
     position: relative;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
     min-width: 10rem;
-    min-height: 3.7rem;
-    padding: 0.7rem 0.9rem;
-    border: 1px solid var(--line-strong);
-    background: var(--background);
+    padding: 0.45rem 0.9rem;
     text-align: center;
 }
 
-.accent-node,
 .decision-node {
-    border-color: var(--line-strong);
-    background: var(--surface-strong);
+    padding: 0.8rem 1.6rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: 2rem;
 }
 
 .flow-node strong,
 .decision-node strong {
-    font-size: 0.72rem;
+    font-size: 0.82rem;
     font-weight: 400;
     line-height: 1.3;
 }
 
 .flow-node small,
 .decision-node small {
-    margin-top: 0.25rem;
+    margin-top: 0.2rem;
     color: var(--text-faint);
-    font-size: 0.6rem;
+    font-size: 0.68rem;
     line-height: 1.35;
-}
-
-.node-index {
-    position: absolute;
-    top: -0.55rem;
-    left: -0.55rem;
-    display: grid;
-    place-items: center;
-    width: 1.15rem;
-    height: 1.15rem;
-    border-radius: 50%;
-    background: var(--text);
-    color: var(--background);
-    font-family: var(--mono);
-    font-size: 0.55rem;
 }
 
 .flow-split {
     position: relative;
     width: 52%;
     height: 2rem;
-    border-bottom: 1px solid var(--line-strong);
+    border-bottom: 1px solid var(--line);
 }
 
 .flow-split::before {
@@ -378,14 +332,14 @@ blockquote p {
     position: absolute;
     left: 50%;
     height: 100%;
-    border-left: 1px solid var(--line-strong);
+    border-left: 1px solid var(--line);
 }
 
 .flow-split span {
     position: absolute;
     bottom: -2rem;
     height: 2rem;
-    border-left: 1px solid var(--line-strong);
+    border-left: 1px solid var(--line);
 }
 
 .flow-split span:first-child {
@@ -428,16 +382,6 @@ blockquote p {
     border-radius: 0.25rem;
     background: var(--code);
     overflow: hidden;
-}
-
-.code-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.65rem 0.9rem;
-    border-bottom: 1px solid #444;
-    color: #aaa;
-    font-family: var(--mono);
-    font-size: 0.62rem;
 }
 
 .code-card pre {
@@ -569,40 +513,48 @@ blockquote p {
 }
 
 .table-wrap {
-    width: min(52rem, calc(100vw - 2rem));
-    margin: 2.5rem 0 2.5rem clamp(-5rem, -7vw, 0rem);
+    margin: 2.5rem 0;
     overflow-x: auto;
-    border-block: 1px solid var(--line);
 }
 
 table {
     width: 100%;
-    min-width: 44rem;
+    min-width: 34rem;
     border-collapse: collapse;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     text-align: left;
 }
 
 caption {
-    padding: 0.8rem;
+    caption-side: bottom;
+    padding-top: 0.75rem;
     color: var(--text-soft);
+    font-size: 0.8rem;
+    line-height: 1.5;
     text-align: left;
 }
 
 th,
 td {
-    padding: 0.8rem;
-    border-top: 1px solid var(--line);
+    padding: 0.55rem 1.25rem 0.55rem 0;
 }
 
 th {
-    color: var(--text-soft);
-    font-weight: 400;
+    border-bottom: 1px solid var(--line);
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    text-transform: uppercase;
+}
+
+td {
+    border-top: 1px solid var(--line);
 }
 
 .verdict {
     color: var(--text);
-    font-weight: 400;
 }
 
 .limitations-list {
@@ -635,9 +587,11 @@ th {
 }
 
 .closing-quote {
-    margin-top: 3.5rem;
-    color: var(--text);
-    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    margin: 3.5rem 0;
+    padding: 1.75rem 0;
+    border-block: 1px solid var(--line);
+    font-size: 1.25rem;
+    font-style: normal;
 }
 
 .loop-statement {
@@ -670,7 +624,6 @@ th {
 @media (prefers-color-scheme: dark) {
     :root {
         --background: #212121;
-        --surface: #292927;
         --surface-strong: #343432;
         --text: #e5e5e5;
         --text-soft: #b3b3b3;
@@ -696,15 +649,14 @@ th {
         margin-bottom: 1rem;
     }
 
-    .diagram,
-    .table-wrap,
     .router-hero {
         width: calc(100vw - 2rem);
         margin-left: 0;
+        margin-bottom: 2rem;
     }
 
-    .router-hero {
-        margin-bottom: 2rem;
+    .note {
+        grid-template-columns: 1fr;
     }
 
     .roles {

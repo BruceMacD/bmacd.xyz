@@ -164,26 +164,25 @@
             </aside>
 
             <section id="basic-loop">
-                <p class="section-number" aria-hidden="true">01</p>
                 <h2>The basic loop</h2>
 
                 <p>The loop uses four models, with three generating outputs and one producing embeddings.</p>
 
                 <div class="roles" role="list">
                     <div role="listitem">
-                        <p class="role-name"><span class="role-dot"></span>Reference model</p>
+                        <p class="role-name">Reference model</p>
                         <p class="role-description">The large model that answers while the router collects evidence.</p>
                     </div>
                     <div role="listitem">
-                        <p class="role-name"><span class="role-dot"></span>Local model</p>
+                        <p class="role-name">Local model</p>
                         <p class="role-description">The local model under test and, later, allowed to answer.</p>
                     </div>
                     <div role="listitem">
-                        <p class="role-name"><span class="role-dot"></span>Evaluator</p>
+                        <p class="role-name">Evaluator</p>
                         <p class="role-description">The model that compares both proposed actions.</p>
                     </div>
                     <div role="listitem">
-                        <p class="role-name"><span class="role-dot"></span>Embedding model</p>
+                        <p class="role-name">Embedding model</p>
                         <p class="role-description">A local model that maps each request to a retrieval vector.</p>
                     </div>
                 </div>
@@ -192,21 +191,20 @@
                     <p class="diagram-label">Router shadow mode</p>
                     <div class="shadow-flow">
                         <div class="flow-node request-node">
-                            <span class="node-index">A</span>
                             <strong>Canonical request</strong>
                             <small>one untouched context</small>
                         </div>
                         <div class="flow-split" aria-hidden="true"><span></span><span></span></div>
                         <div class="parallel-paths">
                             <div class="path">
-                                <div class="flow-node accent-node"><strong>Reference model</strong><small>authoritative stream</small></div>
+                                <div class="flow-node"><strong>Reference model</strong><small>authoritative stream</small></div>
                                 <div class="vertical-arrow" aria-hidden="true">↓</div>
                                 <div class="flow-node"><strong>Reference response</strong><small>the result the agent trusts</small></div>
                                 <div class="vertical-arrow" aria-hidden="true">↓</div>
                                 <div class="flow-node"><strong>Normal agent path</strong><small>shown to the user; tools execute</small></div>
                             </div>
                             <div class="path">
-                                <div class="flow-node accent-node"><strong>Local model</strong><small>bounded background copy</small></div>
+                                <div class="flow-node"><strong>Local model</strong><small>bounded background copy</small></div>
                                 <div class="vertical-arrow" aria-hidden="true">↓</div>
                                 <div class="flow-node"><strong>Local response</strong><small>not executed while the router shadows</small></div>
                                 <div class="vertical-arrow" aria-hidden="true">↓</div>
@@ -216,7 +214,7 @@
                             </div>
                         </div>
                     </div>
-                    <figcaption id="shadow-caption"><span>Figure 1.</span> The reference response follows the normal agent path and can execute tools. The evaluator grades the local response and the router stores it as routing evidence.</figcaption>
+                    <figcaption id="shadow-caption">The reference response follows the normal agent path and can execute tools. The evaluator grades the local response and the router stores it as routing evidence.</figcaption>
                 </figure>
 
                 <p>From the user's point of view, nothing changes. The reference model's stream goes back to the agent as usual while the local model works in the background. Each shadow example records the request, both outputs, their latencies, the request embedding, and the evaluator's grade. If the local model proposes tool calls, the router records them but never runs them.</p>
@@ -224,7 +222,6 @@
                 <p>The evaluator returns a structured verdict rather than free text, so every comparison lands in the dataset in the same shape.</p>
 
                 <div class="code-card" aria-label="Example evaluator output">
-                    <div class="code-header"><span>evaluator-output.json</span><span>structured evidence</span></div>
                     <pre><code>{
   <span class="token-key">"verdict"</span>: <span class="token-value">"pass"</span>,
   <span class="token-key">"confidence"</span>: <span class="token-value">1</span>,
@@ -241,7 +238,6 @@
             </section>
 
             <section id="retrieval">
-                <p class="section-number" aria-hidden="true">02</p>
                 <h2>Routing as retrieval</h2>
 
                 <p>The router's shadow mode produces a growing dataset of graded attempts. To use that evidence, the router predicts whether the local model will succeed on a new request through retrieval. It turns each incoming request into a vector and matches it against the vectors of past shadow examples. I chose <code>embeddinggemma</code> for this role and stored its vectors in SQLite.</p>
@@ -279,7 +275,6 @@
             </section>
 
             <section id="automatic-path">
-                <p class="section-number" aria-hidden="true">03</p>
                 <h2>Automatic routing</h2>
 
                 <p>With a conservative confidence estimate for every request, the router can act on the evidence. When the router runs in automatic mode, it chooses a model before generation, and uses it for the inference step.</p>
@@ -293,19 +288,19 @@
                         <div class="decision-branches">
                             <div class="branch">
                                 <span class="branch-label">No / holdout</span>
-                                <div class="flow-node accent-node"><strong>Reference model + shadow</strong><small>collect another label</small></div>
+                                <div class="flow-node"><strong>Reference model + shadow</strong><small>collect another label</small></div>
                                 <div class="vertical-arrow" aria-hidden="true">↓</div>
                                 <div class="flow-node"><strong>Update evidence</strong></div>
                             </div>
                             <div class="branch">
                                 <span class="branch-label">Yes</span>
-                                <div class="flow-node accent-node"><strong>Stream local model</strong><small>directly to the agent</small></div>
+                                <div class="flow-node"><strong>Stream local model</strong><small>directly to the agent</small></div>
                                 <div class="vertical-arrow" aria-hidden="true">↓</div>
                                 <div class="flow-node"><strong>Normal agent path</strong><small>text and tool calls</small></div>
                             </div>
                         </div>
                     </div>
-                    <figcaption id="decision-caption"><span>Figure 2.</span> The evidence gate decides whether the local model becomes authoritative for this inference step.</figcaption>
+                    <figcaption id="decision-caption">The evidence gate decides whether the local model becomes authoritative for this inference step.</figcaption>
                 </figure>
 
                 <p>On a local win, the router streams the local model's response and never queries the reference model. The evidence gate is the system's trust boundary, and the router's automatic mode moves suitable work onto local hardware.</p>
@@ -317,7 +312,6 @@
             </section>
 
             <section id="evaluation">
-                <p class="section-number" aria-hidden="true">04</p>
                 <h2>A small evaluation</h2>
 
                 <p>With the loop in place, I ran it end to end using the following models.</p>
@@ -364,7 +358,6 @@
             </section>
 
             <section id="limitations">
-                <p class="section-number" aria-hidden="true">05</p>
                 <h2>Limitations</h2>
 
                 <p>A three-example proof makes the limitations easy to see. The largest is the core assumption that retrieval routing works when similar requests have similar outcomes. That holds for repeated extraction, classification, formatting, and narrow coding tasks, but it may break down on agent work where a small change to the input alters the entire tool plan.</p>
@@ -388,7 +381,6 @@
             </section>
 
             <section id="final-thoughts">
-                <p class="section-number" aria-hidden="true">06</p>
                 <h2>What I learned</h2>
 
                 <p>I first described this system to myself as “RAG over the success dataset,” but that name undersells the failures, which matter as much. The useful signal is the full pattern of passes, failures, uncertain results, and unsafe actions under one model and tool contract. Retrieval selects the evidence, the confidence bound measures it, and the resulting route decides which model the agent trusts.</p>
