@@ -7,8 +7,8 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="icon" type="image/svg+xml" href="../../public/favicon.svg">
     <title>Teaching an agent when not to use the big model — Bruce MacDonald</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=pixel-diagrams-3">
+    <script src="script.js?v=pixel-diagrams-3" defer></script>
 </head>
 <body>
     <div class="reading-progress" aria-hidden="true"><span></span></div>
@@ -30,13 +30,26 @@
                 <canvas id="c" width="240" height="120" role="img" aria-label="A coding request passes through a router and follows the active path to a local model instead of the cloud model."></canvas>
                 <script>
                 (() => {
-                  const ctx = document.getElementById('c').getContext('2d');
+                  const canvas = document.getElementById('c');
+                  const logicalWidth = 240;
+                  const logicalHeight = 120;
+                  const cssWidth = canvas.getBoundingClientRect().width || logicalWidth;
+                  const resolutionScale = Math.max(
+                    6,
+                    Math.ceil((window.devicePixelRatio || 1) * cssWidth / logicalWidth)
+                  );
+
+                  canvas.width = logicalWidth * resolutionScale;
+                  canvas.height = logicalHeight * resolutionScale;
+
+                  const ctx = canvas.getContext('2d');
+                  ctx.setTransform(resolutionScale, 0, 0, resolutionScale, 0, 0);
                   const styles = getComputedStyle(document.documentElement);
                   const BACKGROUND = styles.getPropertyValue('--background').trim();
                   const FOREGROUND = styles.getPropertyValue('--text').trim();
 
                   ctx.fillStyle = BACKGROUND;
-                  ctx.fillRect(0, 0, 240, 120);
+                  ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
                   const FAINT = 0.16;   // inactive (cloud) route
                   const DIM   = 0.42;   // active route dots
@@ -187,33 +200,9 @@
                     </div>
                 </div>
 
-                <figure class="diagram" aria-labelledby="shadow-caption">
+                <figure id="shadow-diagram" class="diagram" aria-labelledby="shadow-caption">
                     <p class="diagram-label">Router shadow mode</p>
-                    <div class="shadow-flow">
-                        <div class="flow-node request-node">
-                            <strong>Canonical request</strong>
-                            <small>one untouched context</small>
-                        </div>
-                        <div class="flow-split" aria-hidden="true"><span></span><span></span></div>
-                        <div class="parallel-paths">
-                            <div class="path">
-                                <div class="flow-node"><strong>Reference model</strong><small>authoritative stream</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>Reference response</strong><small>the result the agent trusts</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>Normal agent path</strong><small>shown to the user; tools execute</small></div>
-                            </div>
-                            <div class="path">
-                                <div class="flow-node"><strong>Local model</strong><small>bounded background copy</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>Local response</strong><small>not executed while the router shadows</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>Evaluator</strong><small>grades it against the reference</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>SQLite dataset</strong><small>grade + outputs + vector</small></div>
-                            </div>
-                        </div>
-                    </div>
+                    <canvas class="pixel-diagram" data-diagram="shadow" width="360" height="250" role="img" aria-label="One canonical request is sent to the reference and local models. The reference response follows the normal agent path. The local response is graded by an evaluator and stored as SQLite evidence."></canvas>
                     <figcaption id="shadow-caption">The reference response follows the normal agent path and can execute tools. The evaluator grades the local response and the router stores it as routing evidence.</figcaption>
                 </figure>
 
@@ -279,27 +268,9 @@
 
                 <p>With a conservative confidence estimate for every request, the router can act on the evidence. When the router runs in automatic mode, it chooses a model before generation, and uses it for the inference step.</p>
 
-                <figure class="diagram" aria-labelledby="decision-caption">
+                <figure id="automatic-diagram" class="diagram" aria-labelledby="decision-caption">
                     <p class="diagram-label">Router automatic mode</p>
-                    <div class="decision-flow">
-                        <div class="flow-node wide"><strong>Incoming request</strong><small>embed + retrieve compatible pass and fail rows</small></div>
-                        <div class="vertical-arrow" aria-hidden="true">↓</div>
-                        <div class="decision-node"><strong>Enough evidence?</strong><small>neighbors + Wilson lower bound</small></div>
-                        <div class="decision-branches">
-                            <div class="branch">
-                                <span class="branch-label">No / holdout</span>
-                                <div class="flow-node"><strong>Reference model + shadow</strong><small>collect another label</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>Update evidence</strong></div>
-                            </div>
-                            <div class="branch">
-                                <span class="branch-label">Yes</span>
-                                <div class="flow-node"><strong>Stream local model</strong><small>directly to the agent</small></div>
-                                <div class="vertical-arrow" aria-hidden="true">↓</div>
-                                <div class="flow-node"><strong>Normal agent path</strong><small>text and tool calls</small></div>
-                            </div>
-                        </div>
-                    </div>
+                    <canvas class="pixel-diagram" data-diagram="automatic" width="360" height="205" role="img" aria-label="An incoming request is embedded and matched against compatible evidence. A confidence gate sends holdouts to the reference model for another shadow label and eligible requests directly to the local model."></canvas>
                     <figcaption id="decision-caption">The evidence gate decides whether the local model becomes authoritative for this inference step.</figcaption>
                 </figure>
 
