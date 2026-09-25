@@ -93,6 +93,19 @@ body {
     color: #111;
 }
 
+.intro-name {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.intro-character {
+    width: 1.45em;
+    height: 1.9em;
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
 .description {
     font-size: 1rem;
     color: #444;
